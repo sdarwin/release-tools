@@ -6,7 +6,10 @@
 # (See accompanying file LICENSE_1_0.txt or copy at
 # http://www.boost.org/LICENSE_1_0.txt)
 
+from __future__ import print_function
+
 import os.path
+import sys
 import time
 import shutil
 import site
@@ -14,6 +17,14 @@ import hashlib
 import subprocess
 
 from ci_boost_common import main, utils, script_common, parallel_call
+
+# Check python version
+if sys.version_info[0] == 2 :
+    pythonversion="2"
+    pythonbinary="python2"
+else:
+    pythonversion="3"
+    pythonbinary="python3"
 
 class script(script_common):
     '''
@@ -98,7 +109,15 @@ class script(script_common):
         utils.check_call("gem","install","asciidoctor", "--version", "1.5.8")
         utils.check_call("asciidoctor","--version")
         utils.check_call("gem","install","rouge")
-        utils.check_call("gem","install","pygments.rb", "--version", "1.2.1")
+        if pythonversion=="2":
+            utils.check_call("gem","install","pygments.rb", "--version", "1.2.1")
+        else: 
+            utils.check_call("git","clone","-b","python3","https://github.com/CPPAlliance/pygments.rb")
+            utils.check_call("cd","pygments.rb")
+            utils.check_call("gem","install","multi_json","--version","1.14.1")
+            utils.check_call("ruby","cache-lexers.rb")
+            utils.check_call("gem","build","pygments.rb.gemspec")
+            utils.check_call("gem","install","pygments.rb-1.2.2.gem")
         utils.check_call("pip","install","--user","Pygments==2.1")
         utils.check_call("pip","install","--user","https://github.com/bfgroup/jam_pygments/archive/master.zip")
         os.chdir(self.root_dir)
@@ -220,10 +239,10 @@ class script(script_common):
 
         # Make the real distribution tree from the base tree.
         os.chdir(os.path.join(self.build_dir))
-        utils.check_call('wget','https://raw.githubusercontent.com/boostorg/release-tools/develop/MakeBoostDistro.py')
+        utils.check_call('wget','https://raw.githubusercontent.com/sdarwin/release-tools/python3/MakeBoostDistro.py','-O','MakeBoostDistro.py')
         utils.check_call('chmod','+x','MakeBoostDistro.py')
         os.chdir(os.path.dirname(self.root_dir))
-        utils.check_call('python',os.path.join(self.build_dir,'MakeBoostDistro.py'),
+        utils.check_call(pythonbinary,os.path.join(self.build_dir,'MakeBoostDistro.py'),
             self.root_dir,self.boost_release_name)
         
         packages = []
@@ -269,7 +288,7 @@ class script(script_common):
         
         # Create archive info data files.
         for archive_file in archive_files:
-            sha256_sum = hashlib.sha256(open(archive_file).read()).hexdigest()
+            sha256_sum = hashlib.sha256(open(archive_file,"rb").read()).hexdigest()
             utils.make_file("%s.json"%(archive_file),
                 "{",
                 '"sha256":"%s",'%(sha256_sum),
