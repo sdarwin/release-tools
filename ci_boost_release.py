@@ -311,10 +311,12 @@ class script(script_common):
 	# If GH_TOKEN is set, github releases will activate, similar to the logic for BINTRAY_KEY.
 	# The variable "github_releases_main_repo" determines if github releases will be hosted on the boost repository itself.
 	# If set to False, the github releases will be directed to a separate repo.
-        github_releases_main_repo=True
+        # github_releases_main_repo=True
+        github_releases_main_repo=False
 
         # The next two variables are only used if github_releases_main_repo==False
-        github_releases_target_org="boostorg"
+        # github_releases_target_org="boostorg"
+        github_releases_target_org="sdarwin"
         github_releases_target_repo="boost-releases"
 
         if github_releases_main_repo:
