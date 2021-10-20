@@ -18,6 +18,7 @@ import subprocess
 import codecs
 import shutil
 import threading
+import distutils.dir_util
 
 # For urllib
 from future.standard_library import install_aliases
@@ -550,6 +551,14 @@ class ci_drone(object):
           root_dir = os.path.expanduser(root_dir)
         else:
           root_dir = "/drone/src"
+
+        # The generated docker images contain some preinstalled dependencies in /root/build
+        # However, Drone runs in /drone instead of /root.
+        # So, copy the files over.
+        buildfilessrc="/root/build"
+        buildfilesdst="/drone/build"
+        if os.path.isdir(buildfilessrc):
+            distutils.dir_util.copy_tree(buildfilessrc,buildfilesdst)
 
         kargs['root_dir'] = root_dir
         kargs['branch'] = os.getenv("DRONE_BRANCH")
