@@ -545,7 +545,7 @@ class ci_drone(object):
         buildfilessrc="/root/build"
         buildfilesdst="/drone/build"
         if os.path.isdir(buildfilessrc):
-            distutils.dir_util.copy_tree(buildfilesdst)
+            distutils.dir_util.copy_tree(buildfilessrc,buildfilesdst)
 
         kargs['root_dir'] = root_dir
         kargs['branch'] = os.getenv("DRONE_BRANCH")
