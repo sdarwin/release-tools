@@ -16,6 +16,7 @@ import subprocess
 import codecs
 import shutil
 import threading
+import distutils.dir_util
 
 class SystemCallError(Exception):
     def __init__(self, command, result):
