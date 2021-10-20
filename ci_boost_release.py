@@ -425,9 +425,10 @@ class script(script_common):
                     '%s'%(credentialhelperscript))
 
             # Create a release, if one is not present
-            list_of_releases=subprocess.check_output(['gh',
-                'release',
-                'list'])
+            if pythonversion=="2":
+                list_of_releases=subprocess.check_output(['gh', 'release', 'list'])
+            else:
+                list_of_releases=subprocess.check_output(['gh', 'release', 'list'], encoding='UTF-8' )
 
             if github_release_name not in list_of_releases:
                 utils.check_call('gh',
