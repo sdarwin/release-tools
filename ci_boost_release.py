@@ -316,7 +316,7 @@ class script(script_common):
 
         # The next two variables are only used if github_releases_main_repo==False
         # github_releases_target_org="boostorg"
-        github_releases_target_org="sdarwin"
+        github_releases_target_org="samd2"
         github_releases_target_repo="boost-releases"
 
         if github_releases_main_repo:
