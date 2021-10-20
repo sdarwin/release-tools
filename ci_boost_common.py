@@ -538,6 +538,14 @@ class ci_drone(object):
         else:
           root_dir = "/drone/src"
 
+        # The generated docker images contain some preinstalled dependencies in /root/build
+        # However, Drone runs in /drone instead of /root.
+        # So, copy the files over.
+        buildfilessrc="/root/build"
+        buildfilesdst="/drone/build"
+        if os.path.isdir(buildfilessrc):
+            distutils.dir_util.copy_tree(buildfilesdst)
+
         kargs['root_dir'] = root_dir
         kargs['branch'] = os.getenv("DRONE_BRANCH")
         kargs['commit'] = os.getenv("DRONE_COMMIT")
