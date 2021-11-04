@@ -18,6 +18,7 @@ from jinja2 import Environment, BaseLoader
 import json
 import pprint
 from collections import defaultdict
+import re
 
 boostlibrarycategories = defaultdict(dict)
 boostlibrarycategories["Algorithms"]["title"] = "Algorithms"
@@ -46,10 +47,23 @@ boostlibrarycategories["String"]["title"] = "String and text processing"
 boostlibrarycategories["System"]["title"] = "System"
 boostlibrarycategories["Workarounds"]["title"] = "Broken compiler workarounds"
 
+for category in boostlibrarycategories:
+    boostlibrarycategories[category]["libraries"]=[]
+
 boostlibrariestoskip=["libs/numeric"]
 boostlibrariestoadd=["libs/numeric/conversion", "libs/numeric/interval", "libs/numeric/odeint", "libs/numeric/ublas"]
 
 def generatehtmlpages():
+
+    def names_to_string(names):
+        if isinstance(names, list):
+            last_name = names.pop()
+            if len(names) > 0:
+                return ", ".join(names) + " and " + last_name
+            else:
+                return last_name
+        else:
+            return names
 
     # Ingest all boost library metadata:
     allmetadata={}
@@ -61,7 +75,7 @@ def generatehtmlpages():
             all_libraries.append(directoryname)
 
     for directoryname in all_libraries:
-        librarypath=re.sub(r'^libs/','',directoryname))
+        librarypath=re.sub(r'^libs/','',directoryname)
         with open(directoryname + "/meta/libraries.json", 'r',  encoding="utf-8") as file:
             file_contents = file.read()
             data = json.loads(file_contents)
@@ -76,19 +90,36 @@ def generatehtmlpages():
                     allmetadata[key]["librarypath"]=librarypath
     # pprint.pprint(allmetadata)
 
-    # fix documentation
-    for item in allmetadata:
-        if 
+    for key, value in allmetadata.items():
+        # fix documentation
+        if not "documentation" in value:
+            allmetadata[key]["documentation"]=value["librarypath"] + "/index.html"
+        # modify description
+        allmetadata[key]["description_modified"]=re.sub(r'\s*\.\s*$','', allmetadata[key]["description"])
+        # modify authors
+        allmetadata[key]["authors_modified"]=names_to_string(allmetadata[key]["authors"])
+
+    # determine libraries per category
+    for category in boostlibrarycategories:
+        for library in allmetadata:
+            if category in allmetadata[library]["category"]:
+                boostlibrarycategories[category]["libraries"].append(library)
+            # sort
+            boostlibrarycategories[category]["libraries"].sort(key=lambda x: allmetadata[x]["name"])
+
+    # pprint.pprint(boostlibrarycategories)
+    # quit()
 
     # for sourcefile in ["index.html", "libs/libraries.htm"]:
     for sourcefile in ["libs/libraries.htm"]:
         with open(sourcefile, 'r',  encoding="utf-8") as file:
             file_contents = file.read()
-        file_contents = file_contents.replace('{{#categorized}}\n','{% for key, value in boostlibrarycategories.items() %}{% set name = key %}{% set title = value["title"] %}' ) 
+        # file_contents = file_contents.replace('{{#categorized}}\n','{% for key, value in boostlibrarycategories.items() %}{% set category = key %}{% set name = key %}{% set title = value["title"] %}' ) 
+        file_contents = file_contents.replace('{{#categorized}}\n','{% for key, value in boostlibrarycategories.items() %}{% set category = key %}{% set name = key %}' ) 
         file_contents = file_contents.replace('{{/categorized}}\n','{% endfor %}')
-        file_contents = file_contents.replace('{{#alphabetic}}\n','{% for key, value in allmetadata.items() %}{% set name = value["name"] %}{% set authors = value["author"] %}')
+        file_contents = file_contents.replace('{{#alphabetic}}\n','{% for key, value in allmetadata.items()|sort(attribute="1.name") %}{% set name = value["name"] %}{% set authors = value["authors_modified"] %}{% set link = value["documentation"] %}{% set description = value["description_modified"] %}')
         file_contents = file_contents.replace('{{/alphabetic}}\n','{% endfor %}')
-        file_contents = file_contents.replace('{{#libraries}}\n','{% for key, value in allmetadata.items() %}{% set name = value["name"] %}{% set authors = value["author"] %}')
+        file_contents = file_contents.replace('{{#libraries}}\n','{% for library in boostlibrarycategories[category]["libraries"] %}{% set name = allmetadata[library]["name"] %}{% set authors = allmetadata[library]["authors_modified"] %}{% set link = allmetadata[library]["documentation"] %}{% set description = allmetadata[library]["description_modified"] %}')
         file_contents = file_contents.replace('{{/libraries}}\n','{% endfor %}')
         file_contents = file_contents.replace('{{#authors}}','')
         file_contents = file_contents.replace('{{/authors}}','')
@@ -97,7 +128,7 @@ def generatehtmlpages():
 }}
 """
         file_contents = file_contents.replace(string,'')
-        # print(file_contents)
+        print(file_contents)
         rtemplate = Environment(loader=BaseLoader).from_string(file_contents)
         data = rtemplate.render(allmetadata=allmetadata,boostlibrarycategories=boostlibrarycategories)
         print(data)
