@@ -443,13 +443,13 @@ class script(script_common):
             archive_files.append(
                 '%s%s.tar.gz'%(self.boost_release_name, self.archive_tag));
             packages.append(parallel_call(
-                'tar','-zcf',
+                'tar','-zcf','--exclude','ci_boost_common.py','--exclude','ci_boost_release.py',
                 '%s%s.tar.gz'%(self.boost_release_name, self.archive_tag),
                 self.boost_release_name))
             archive_files.append(
                 '%s%s.tar.bz2'%(self.boost_release_name, self.archive_tag));
             packages.append(parallel_call(
-                'tar','-jcf',
+                'tar','-jcf','--exclude','ci_boost_common.py','--exclude','ci_boost_release.py',
                 '%s%s.tar.bz2'%(self.boost_release_name, self.archive_tag),
                 self.boost_release_name))
         
@@ -459,14 +459,14 @@ class script(script_common):
             archive_files.append(
                 '%s%s.zip'%(self.boost_release_name, self.archive_tag));
             packages.append(parallel_call(
-                'zip','-qr','-9',
+                'zip','-qr','-9','--exclude','ci_boost_common.py','--exclude','ci_boost_release.py',
                 '%s%s.zip'%(self.boost_release_name, self.archive_tag),
                 self.boost_release_name))
             archive_files.append(
                 '%s%s.7z'%(self.boost_release_name, self.archive_tag));
             with open('/dev/null') as dev_null:
                 utils.check_call(
-                    '7z','a','-bd','-mx=7','-ms=on',
+                    '7z','a','-bd','-mx=7','-ms=on','-x!ci_boost_common.py','-x!ci_boost_release.py',
                     '%s%s.7z'%(self.boost_release_name, self.archive_tag),
                     self.boost_release_name, stdout=dev_null)
         
