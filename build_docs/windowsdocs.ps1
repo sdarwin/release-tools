@@ -1,9 +1,79 @@
 
-$REPONAME=[io.path]::GetFileNameWithoutExtension($(git config --get remote.origin.url))
-echo "REPONAME is $REPONAME"
-$BOOST_SRC_FOLDER=$(git rev-parse --show-toplevel)
-echo "BOOST_SRC_FOLDER is $BOOST_SRC_FOLDER"
+param (
+   [Parameter(Mandatory=$false)][alias("path")][string]$pathoption = "",
+   [Parameter(Mandatory=$false)][alias("type")][string]$typeoption = "",
+   [switch]$help = $false
+)
+
+$scriptname="windowsdocs.ps1"
+
+if ($help) {
+
+$helpmessage="
+usage: $scriptname [-help] [-type TYPE] [path_to_library]
+
+Builds library documentation.
+
+optional arguments:
+  -help                 Show this help message and exit
+  -type TYPE            The `"type`" of build. Defaults to `"main`" which installs all standard boost prerequisites.
+                        Another option is `"cppal`" which installs the prerequisites used by boostorg/json and a few other similar libraries.
+                        More `"types`" can be added in the future if your library needs a specific set of packages installed.
+                        The type is usually auto-detected and doesn't need to be specified.
+
+standard arguments:
+  path_to_library       Where the library is located. Defaults to current working directory.
+"
+
+echo $helpmessage
+exit 0
+}
+
+pushd
+
+if ($pathoption) {
+    echo "Library path set to $pathoption. Changing to that directory."
+    cd $pathoption
+}
+else
+{
+    $workingdir = pwd
+    echo "Using current working directory $workingdir."
+}
+
+# DETERMINE REPOSITORY
+
+$originurl=git config --get remote.origin.url
+if ($LASTEXITCODE -eq 0)  {
+    $REPONAME=[io.path]::GetFileNameWithoutExtension($originurl)
+}
+else { 
+    $REPONAME="empty"
+}
+
+if (($REPONAME -eq "empty") -or ($REPONAME -eq "release-tools")) {
+    echo ""
+    echo "Set the path_to_library as the first command-line argument:"
+    echo ""
+    echo "$scriptname _path_to_library_"
+    echo ""
+    echo "Or change the working directory to that first."
+    exit 1
+}
+else {
+    echo "REPONAME is $REPONAME"
+}
+
+$BOOST_SRC_FOLDER=git rev-parse --show-toplevel
+if ( ! $LASTEXITCODE -eq 0)  {
+    $BOOST_SRC_FOLDER="nofolder"
+}
+else {
+    echo "BOOST_SRC_FOLDER is $BOOST_SRC_FOLDER"
+}
+
 $PARENTNAME=[io.path]::GetFileNameWithoutExtension($(git --git-dir $BOOST_SRC_FOLDER/../../.git config --get remote.origin.url))
+
 
 if ( $PARENTNAME -eq "boost" )
 {
@@ -14,6 +84,27 @@ else
 {
     echo "Not starting out inside boost-root"
     $BOOSTROOTLIBRARY="no"
+}
+
+# DECIDE THE TYPE
+
+$alltypes="main cppal"
+$cppaltypes="json beast url http_proto socks_proto zlib"
+
+if (! $typeoption ) {
+    if ($cppaltypes.contains($REPONAME)) {
+        $typeoption="cppal"
+    }
+    else {
+        $typeoption="main"
+    }
+}
+
+echo "Build type is $typeoption"
+
+if ( ! $alltypes.contains($typeoption)) {
+    echo "Allowed types are currently 'main' and 'cppal'. Not $typeoption. Please choose a different option. Exiting."
+    exit 1
 }
 
 $REPO_BRANCH=git rev-parse --abbrev-ref HEAD
@@ -52,6 +143,13 @@ if ( -Not (Get-Command git -errorAction SilentlyContinue) )
     choco install -y git
 }
 
+if ($typeoption -eq "main") {
+if ( -Not (Get-Command ruby -errorAction SilentlyContinue) )
+{
+    choco install -y ruby
+}
+}
+
 # Make `refreshenv` available right away, by defining the $env:ChocolateyInstall
 # variable and importing the Chocolatey profile module.
 # Note: Using `. $PROFILE` instead *may* work, but isn't guaranteed to.
@@ -59,6 +157,17 @@ $env:ChocolateyInstall = Convert-Path "$((Get-Command choco).Path)\..\.."
 Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
 
 refreshenv
+
+# if [ "$typeoption" = "main" ]; then
+#     sudo apt-get install -y python3-pip ruby docutils-doc docutils-common python3-docutils
+#     sudo gem install asciidoctor --version 1.5.8
+#     sudo pip3 install docutils
+# fi
+
+if ($typeoption -eq "main") {
+    gem install asciidoctor --version 1.5.8
+    pip install docutils
+}
 
 # A bug fix, which may need to be developed further:
 # b2 reports that the "cp" command can't be found on Windows.
@@ -154,6 +263,14 @@ git submodule update --init tools/docca
 git submodule update --init tools/quickbook
 git submodule update --init tools/build
 
+if ($typeoption -eq "main") {
+    git submodule update --init tools/auto_index
+    git submodule update --quiet --init --recursive
+
+    # recopy the library as it might have been overwritten
+    Copy-Item -Path $BOOST_SRC_FOLDER\* -Destination libs\$REPONAME\ -Recurse -Force
+}
+
 $matcher='\.saxonhe_jar = \$(jar\[1\]) ;$'
 $replacer='.saxonhe_jar = $(jar[1]) ;  .saxonhe_jar = \"/usr/share/java/Saxon-HE.jar\" ;'
 sed -i "s~$matcher~$replacer~" tools/build/src/tools/saxonhe.jam
@@ -171,4 +288,30 @@ $filename="$Env:BOOST_ROOT\tools\build\src\user-config.jam"
 [IO.File]::WriteAllLines($filename, $content)
 
 ./b2 libs/$REPONAME/doc/
+if ($typeoption -eq "main") {
+    ./b2 -q -d0 --build-dir=build --distdir=build/dist tools/quickbook tools/auto_index/build
+    $content='using quickbook : build/dist/bin/quickbook ; using auto-index : build/dist/bin/auto_index ; using docutils ; using doxygen : "/Program Files/doxygen/bin/doxygen.exe" ; using boostbook ; using asciidoctor ; using saxonhe ;'
+    $filename="$Env:BOOST_ROOT\tools\build\src\user-config.jam"
+    [IO.File]::WriteAllLines($filename, $content)
+    ./b2 libs/$REPONAME/doc/
+}
+elseif ($typeoption -eq "cppal") {
+    $content='using doxygen : "/Program Files/doxygen/bin/doxygen.exe" ; using boostbook ; using saxonhe ;'
+    $filename="$Env:BOOST_ROOT\tools\build\src\user-config.jam"
+    [IO.File]::WriteAllLines($filename, $content)
+    ./b2 libs/$REPONAME/doc/
+}
+
+if ($BOOSTROOTLIBRARY -eq "yes") {
+    echo ""
+    echo "Build completed. Check the doc/ directory."
+    echo ""
+}
+else {
+    echo ""
+    echo "Build completed. Check the ../boost-root/libs/${REPONAME}/doc directory."
+    echo ""
+}
+
+popd
 
