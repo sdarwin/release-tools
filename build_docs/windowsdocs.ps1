@@ -1,4 +1,10 @@
 
+# Copyright Sam Darwin 2022
+#
+# Distributed under the Boost Software License, Version 1.0.
+# (See accompanying file LICENSE_1_0.txt or copy at
+# http://www.boost.org/LICENSE_1_0.txt)
+
 param (
    [Parameter(Mandatory=$false)][alias("path")][string]$pathoption = "",
    [Parameter(Mandatory=$false)][alias("type")][string]$typeoption = "",
@@ -30,6 +36,26 @@ exit 0
 }
 
 pushd
+
+# git is required. In the unlikely case it's not yet installed, moving that part of the package install process
+# here to an earlier part of the script:
+
+if ( -Not (Get-Command choco -errorAction SilentlyContinue) ) {
+    echo "Install chocolatey"
+    iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))
+}
+
+if ( -Not (Get-Command git -errorAction SilentlyContinue) ) {
+    echo "Install git"
+    choco install -y git
+}
+
+# Make `refreshenv` available right away, by defining the $env:ChocolateyInstall
+# variable and importing the Chocolatey profile module.
+# Note: Using `. $PROFILE` instead *may* work, but isn't guaranteed to.
+$env:ChocolateyInstall = Convert-Path "$((Get-Command choco).Path)\..\.."
+Import-Module "$env:ChocolateyInstall\helpers\chocolateyProfile.psm1"
+refreshenv
 
 if ($pathoption) {
     echo "Library path set to $pathoption. Changing to that directory."
@@ -123,8 +149,10 @@ echo "BOOST_BRANCH is $BOOST_BRANCH"
 
 echo '==================================> INSTALL'
 
-echo "Install chocolatey"
-iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))
+if ( -Not (Get-Command choco -errorAction SilentlyContinue) ) {
+    echo "Install chocolatey"
+    iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))
+}
 
 choco install -y rsync sed doxygen.install xsltproc docbook-bundle
 

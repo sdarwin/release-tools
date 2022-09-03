@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Copyright Sam Darwin 2022
+#
+# Distributed under the Boost Software License, Version 1.0.
+# (See accompanying file LICENSE_1_0.txt or copy at
+# http://www.boost.org/LICENSE_1_0.txt)
+
 set -e
 
 scriptname="macosdocs.sh"
@@ -43,6 +49,20 @@ standard arguments:
         *) echo "Internal error!" ; exit 1 ;;
     esac
 done
+
+# git is required. In the unlikely case it's not yet installed, moving that part of the package install process
+# here to an earlier part of the script:
+
+if ! command -v brew &> /dev/null
+then
+    echo "Installing brew. Check the instructions that are shown."
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+fi
+
+if ! command -v git &> /dev/null
+then
+    brew install git
+fi
 
 if [ -n "$1" ]; then
     echo "Library path set to $1. Changing to that directory."

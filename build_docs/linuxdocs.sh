@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Copyright Sam Darwin 2022
+#
+# Distributed under the Boost Software License, Version 1.0.
+# (See accompanying file LICENSE_1_0.txt or copy at
+# http://www.boost.org/LICENSE_1_0.txt)
+
 set -e
 
 scriptname="linuxdocs.sh"
@@ -43,6 +49,15 @@ standard arguments:
         *) echo "Internal error!" ; exit 1 ;;
     esac
 done
+
+# git is required. In the unlikely case it's not yet installed, moving that part of the package install process
+# here to an earlier part of the script:
+
+sudo apt-get update
+if ! command -v git &> /dev/null
+then
+    sudo apt-get install -y git
+fi
 
 if [ -n "$1" ]; then
     echo "Library path set to $1. Changing to that directory."
@@ -99,7 +114,8 @@ if git rev-parse --abbrev-ref HEAD | grep master ; then BOOST_BRANCH=master ; el
 
 echo '==================================> INSTALL'
 
-sudo apt-get update
+# already done
+# sudo apt-get update
 sudo apt-get install -y docbook docbook-xml docbook-xsl xsltproc libsaxonhe-java default-jre-headless flex libfl-dev bison unzip rsync wget python3 cmake build-essential
 
 if [ "$typeoption" = "main" ]; then

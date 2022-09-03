@@ -16,7 +16,9 @@ The repo has already been placed in boost-root/libs/_name-of-this-repo_, and tha
 
 Either of the above choices are possible. The build scripts detect if they are being run from a boost-root or not.
 
-In order to build the documentation, refer to the appropriate sections below:
+In order to build the documentation, refer to the appropriate sections below.
+
+Note: One of the main actions of these scripts is to install _packages_. Depending on the operating system this may be using apt, brew, choco, pip, or a different package manager. Usually this is perfectly fine. However, If you are concerned about package conflicts on your local machine, run the installation in a docker container or a separate cloud server to isolate the build process. The script will not install a C++ compiler, since there are many choices in that realm, so make sure a compiler is available.
 
 ## Linux
 
