@@ -268,9 +268,10 @@ if ( ${skip-boost} ) {
 
     else {
         cd ..
-        if ( -Not (Test-Path -Path "boost-root") )
+        if ( -Not (Test-Path -Path "boost-root") ) {
             echo "boost-root missing. Rerun this script without the -skip-boost or -quick option."
             exit(1)
+	    }
         else {
             cd boost-root
             $Env:BOOST_ROOT=Get-Location | Foreach-Object { $_.Path }
@@ -280,12 +281,13 @@ if ( ${skip-boost} ) {
                 rmdir libs\$REPONAME -Force -Recurse
             }
             Copy-Item -Path $BOOST_SRC_FOLDER -Destination libs\$REPONAME -Recurse -Force
-        }
+            }
+        } 
+    }
 else {
     # skip-boost was not set. The standard flow.
     #
-    if ( $BOOSTROOTLIBRARY -eq "yes" )
-    {
+    if ( $BOOSTROOTLIBRARY -eq "yes" ) {
         echo "updating boost-root"
         cd ../..
         git checkout $BOOST_BRANCH
@@ -293,11 +295,9 @@ else {
         $Env:BOOST_ROOT=Get-Location | Foreach-Object { $_.Path }
         echo "Env:BOOST_ROOT is $Env:BOOST_ROOT"
     }
-    else
-    {
+    else {
         cd ..
-        if ( -Not (Test-Path -Path "boost-root") )
-        {
+        if ( -Not (Test-Path -Path "boost-root") ) {
             echo "cloning boost-root"
             git clone -b $BOOST_BRANCH https://github.com/boostorg/boost.git boost-root --depth 1
             cd boost-root
@@ -309,8 +309,7 @@ else {
             }
             Copy-Item -Path $BOOST_SRC_FOLDER -Destination libs\$REPONAME -Recurse -Force
         }
-        else
-        {
+        else {
             echo "updating boost-root"
             cd boost-root
             git checkout $BOOST_BRANCH
