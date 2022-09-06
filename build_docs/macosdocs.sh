@@ -1,10 +1,9 @@
 #!/bin/bash
 
-# Copyright Sam Darwin 2022
+# Copyright 2022 Sam Darwin
 #
 # Distributed under the Boost Software License, Version 1.0.
-# (See accompanying file LICENSE_1_0.txt or copy at
-# http://www.boost.org/LICENSE_1_0.txt)
+# (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
 
 set -e
 

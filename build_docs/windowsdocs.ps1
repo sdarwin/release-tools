@@ -1,9 +1,8 @@
 
-# Copyright Sam Darwin 2022
+# Copyright 2022 Sam Darwin
 #
 # Distributed under the Boost Software License, Version 1.0.
-# (See accompanying file LICENSE_1_0.txt or copy at
-# http://www.boost.org/LICENSE_1_0.txt)
+# (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
 
 param (
    [Parameter(Mandatory=$false)][alias("path")][string]$pathoption = "",
@@ -195,6 +194,8 @@ refreshenv
 if ($typeoption -eq "main") {
     gem install asciidoctor --version 1.5.8
     pip install docutils
+    $pattern = '[\\/]'
+    $asciidoctorpath=(get-command asciidoctor).Path -replace $pattern, '/'
 }
 
 # A bug fix, which may need to be developed further:
@@ -262,11 +263,11 @@ else
         cd boost-root
         $Env:BOOST_ROOT=Get-Location | Foreach-Object { $_.Path }
         echo "Env:BOOST_ROOT is $Env:BOOST_ROOT"
-        if ( -Not (Test-Path -Path "libs\$REPONAME") )
+        if (Test-Path -Path "libs\$REPONAME")
         {
-            mkdir libs\$REPONAME
+            rmdir libs\$REPONAME -Force -Recurse
         }
-        Copy-Item -Path $BOOST_SRC_FOLDER\* -Destination libs\$REPONAME\ -Recurse -Force
+        Copy-Item -Path $BOOST_SRC_FOLDER -Destination libs\$REPONAME -Recurse -Force
     }
     else
     {
@@ -276,14 +277,13 @@ else
         git pull
         $Env:BOOST_ROOT=Get-Location | Foreach-Object { $_.Path }
         echo "Env:BOOST_ROOT is $Env:BOOST_ROOT"
-        if ( -Not (Test-Path -Path "libs\$REPONAME") )
+        if (Test-Path -Path "libs\$REPONAME")
         {
-            mkdir libs\$REPONAME
+            rmdir libs\$REPONAME -Force -Recurse
         }
-        Copy-Item -Path $BOOST_SRC_FOLDER\* -Destination libs\$REPONAME\ -Recurse -Force
+        Copy-Item -Path $BOOST_SRC_FOLDER -Destination libs\$REPONAME -Recurse -Force
     }
 }
-
 git submodule update --init libs/context
 git submodule update --init tools/boostbook
 git submodule update --init tools/boostdep
@@ -318,13 +318,13 @@ $filename="$Env:BOOST_ROOT\tools\build\src\user-config.jam"
 ./b2 libs/$REPONAME/doc/
 if ($typeoption -eq "main") {
     ./b2 -q -d0 --build-dir=build --distdir=build/dist tools/quickbook tools/auto_index/build
-    $content='using quickbook : build/dist/bin/quickbook ; using auto-index : build/dist/bin/auto_index ; using docutils ; using doxygen : "/Program Files/doxygen/bin/doxygen.exe" ; using boostbook ; using asciidoctor ; using saxonhe ;'
+    $content="using quickbook : build/dist/bin/quickbook ; using auto-index : build/dist/bin/auto_index ; using docutils ; using doxygen : `"/Program Files/doxygen/bin/doxygen.exe`" ; using boostbook ; using asciidoctor : `"$asciidoctorpath`" ; using saxonhe ;"
     $filename="$Env:BOOST_ROOT\tools\build\src\user-config.jam"
     [IO.File]::WriteAllLines($filename, $content)
     ./b2 libs/$REPONAME/doc/
 }
 elseif ($typeoption -eq "cppal") {
-    $content='using doxygen : "/Program Files/doxygen/bin/doxygen.exe" ; using boostbook ; using saxonhe ;'
+    $content="using doxygen : `"/Program Files/doxygen/bin/doxygen.exe`" ; using boostbook ; using saxonhe ;"
     $filename="$Env:BOOST_ROOT\tools\build\src\user-config.jam"
     [IO.File]::WriteAllLines($filename, $content)
     ./b2 libs/$REPONAME/doc/
