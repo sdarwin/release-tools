@@ -124,15 +124,60 @@ if git rev-parse --abbrev-ref HEAD | grep master ; then BOOST_BRANCH=master ; el
 
 echo '==================================> INSTALL'
 
-if [ "$skippackagesoption" != "yes" ]; then
-    # already done
-    # sudo apt-get update
-    sudo apt-get install -y docbook docbook-xml docbook-xsl xsltproc libsaxonhe-java default-jre-headless flex libfl-dev bison unzip rsync wget python3 cmake build-essential
+# all:    
+#         bison 		ALREADY THERE
+#         cmake 		ALREADY ON LINUX. CHECK OTHERS?
+#         curl 			TO ADD. CHECK OTHERS.
+#         docbook		ALREADY THERE
+#         docbook-xml 		ALREADY THERE
+#         docbook-xsl 		ALREADY THERE
+#         docutils-common 	ALREADY THERE
+#         docutils-doc 		ALREADY THERE
+#         flex 			ALREADY THERE
+#         xsltproc 		ALREADY THERE
+#         openssh-client 	UNCLEAR. MIGHT LEAVE OUT.
+#         git 			ALREADY THERE
+#         graphviz		TO ADD boost/graph or graph_parallel might need it.
+#         texlive		TO ADD 
+#         sshpass 		UNCLEAR. MIGHT LEAVE OUT.
+#         ghostscript 		TO ADD?
+#         unzip 		ALREADY THERE	
+#         wget 			ALREADY THERE
+#         p7zip-full  		IF THIS IS NEEDED TO BUILD THE BUNDLE, can leave out.
+#         python3-pip 		ALREADY THERE
+#         ruby			ALREADY THERE 
+#         python3-docutils	ALREADY THERE 
+#         libsaxonhe-java 	ALREADY THERE
+#         texlive-latex-extra 	TO ADD?
 
+if [ "$skippackagesoption" != "yes" ]; then
+
+    # already done:
+    # sudo apt-get update
+
+    sudo apt-get install -y build-essential cmake curl default-jre-headless python3 rsync unzip wget
+
+    if [ "$typeoption" = "cppal" ]; then
+        sudo apt-get install -y bison docbook docbook-xml docbook-xsl flex libfl-dev libsaxonhe-java xsltproc
+    fi 
     if [ "$typeoption" = "main" ]; then
-        sudo apt-get install -y python3-pip ruby docutils-doc docutils-common python3-docutils
-        sudo gem install asciidoctor --version 1.5.8
+        sudo apt-get install -y python3-pip ruby
+        sudo apt-get install -y bison docbook docbook-xml docbook-xsl docutils-doc docutils-common flex libfl-dev libsaxonhe-java python3-docutils xsltproc
+        sudo gem install asciidoctor --version 2.0.16
         sudo pip3 install docutils
+        # Is rapidxml required? It is downloading to the local directory.
+        # wget -O rapidxml.zip http://sourceforge.net/projects/rapidxml/files/latest/download
+        # unzip -n -d rapidxml rapidxml.zip
+        pip3 install --user https://github.com/bfgroup/jam_pygments/archive/master.zip
+        pip3 install --user Jinja2==2.11.2
+        pip3 install --user MarkupSafe==1.1.1
+        gem install pygments.rb --version 2.1.0
+        pip3 install --user Pygments==2.2.0
+        sudo gem install rouge --version 3.26.1
+        echo "Sphinx==1.5.6" > constraints.txt
+        pip3 install --user Sphinx==1.5.6
+        pip3 install --user sphinx-boost==0.0.3
+        pip3 install --user -c constraints.txt git+https://github.com/rtfd/recommonmark@50be4978d7d91d0b8a69643c63450c8cd92d1212
     fi
 
     cd $BOOST_SRC_FOLDER

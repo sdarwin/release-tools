@@ -198,10 +198,23 @@ if ( -Not ${skip-packages} ) {
     refreshenv
     
     if ($typeoption -eq "main") {
-        gem install asciidoctor --version 1.5.8
+        gem install asciidoctor --version 2.0.16
         pip install docutils
         $pattern = '[\\/]'
         $asciidoctorpath=(get-command asciidoctor).Path -replace $pattern, '/'
+        # Is rapidxml required? It is downloading to the local directory.
+        # wget -O rapidxml.zip http://sourceforge.net/projects/rapidxml/files/latest/download
+        # unzip -n -d rapidxml rapidxml.zip
+        pip3 install --user https://github.com/bfgroup/jam_pygments/archive/master.zip
+        pip3 install --user Jinja2==2.11.2
+        pip3 install --user MarkupSafe==1.1.1
+        gem install pygments.rb --version 2.1.0
+        pip3 install --user Pygments==2.2.0
+        sudo gem install rouge --version 3.26.1
+        echo "Sphinx==1.5.6" > constraints.txt
+        pip3 install --user Sphinx==1.5.6
+        pip3 install --user sphinx-boost==0.0.3
+        pip3 install --user -c /root/build/constraints.txt git+https://github.com/rtfd/recommonmark@50be4978d7d91d0b8a69643c63450c8cd92d1212
     }
     
     # A bug fix, which may need to be developed further:
