@@ -197,12 +197,6 @@ if ( -Not ${skip-packages} ) {
     
     refreshenv
     
-    # if [ "$typeoption" = "main" ]; then
-    #     sudo apt-get install -y python3-pip ruby docutils-doc docutils-common python3-docutils
-    #     sudo gem install asciidoctor --version 1.5.8
-    #     sudo pip3 install docutils
-    # fi
-    
     if ($typeoption -eq "main") {
         gem install asciidoctor --version 1.5.8
         pip install docutils
@@ -255,6 +249,13 @@ if ( -Not ${skip-packages} ) {
     }
 
 }
+
+# readding the path fix from above, even if skip-packages was set.
+$newpathitem="C:\Program Files\Git\usr\bin"
+if( (Test-Path -Path $newpathitem) -and -Not ( $env:Path -like "*$newpathitem*"))
+    {
+     $env:Path += ";$newpathitem"
+    }
 
 cd $BOOST_SRC_FOLDER
 

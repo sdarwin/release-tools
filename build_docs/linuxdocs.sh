@@ -124,7 +124,7 @@ if git rev-parse --abbrev-ref HEAD | grep master ; then BOOST_BRANCH=master ; el
 
 echo '==================================> INSTALL'
 
-if [ -z "$skippackagesoption" ]; then
+if [ "$skippackagesoption" != "yes" ]; then
     # already done
     # sudo apt-get update
     sudo apt-get install -y docbook docbook-xml docbook-xsl xsltproc libsaxonhe-java default-jre-headless flex libfl-dev bison unzip rsync wget python3 cmake build-essential
