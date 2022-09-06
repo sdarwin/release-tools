@@ -214,7 +214,7 @@ if ( -Not ${skip-packages} ) {
         echo "Sphinx==1.5.6" > constraints.txt
         pip3 install --user Sphinx==1.5.6
         pip3 install --user sphinx-boost==0.0.3
-        pip3 install --user -c /root/build/constraints.txt git+https://github.com/rtfd/recommonmark@50be4978d7d91d0b8a69643c63450c8cd92d1212
+        pip3 install --user -c constraints.txt git+https://github.com/rtfd/recommonmark@50be4978d7d91d0b8a69643c63450c8cd92d1212
     }
     
     # A bug fix, which may need to be developed further:
