@@ -11,7 +11,7 @@ scriptname="linuxdocs.sh"
 
 # READ IN COMMAND-LINE OPTIONS
 
-TEMP=`getopt -o t:,h:: --long type:,help:: -- "$@"`
+TEMP=`getopt -o t:,h::,sb::,sp::,q:: --long type:,help::,skip-boost::,skip-packages::,quick:: -- "$@"`
 eval set -- "$TEMP"
 
 # extract options and their arguments into variables.
@@ -25,11 +25,13 @@ Builds library documentation.
 
 optional arguments:
   -h, --help            Show this help message and exit
-  --type TYPE           The \"type\" of build. Defaults to \"main\" which installs all standard boost prerequisites.
+  -t, --type TYPE       The \"type\" of build. Defaults to \"main\" which installs all standard boost prerequisites.
                         Another option is \"cppal\" which installs the prerequisites used by boostorg/json and a few other similar libraries.
                         More \"types\" can be added in the future if your library needs a specific set of packages installed.
                         The type is usually auto-detected and doesn't need to be specified.
-
+  -sb, --skip-boost	Skip downloading boostorg/boost and building b2 if you are certain those steps have already been done.
+  -sp, --skip-packages	Skip installing all packages (pip, gem, apt, etc.) if you are certain that has already been done.
+  -q, --quick		Equivalent to setting both --skip-boost and --skip-packages. If not sure, then don't skip these steps.
 standard arguments:
   path_to_library	Where the library is located. Defaults to current working directory.
 """
@@ -44,6 +46,12 @@ standard arguments:
                 "") typeoption="" ; shift 2 ;;
                  *) typeoption=$2 ; shift 2 ;;
             esac ;;
+	-sb|--skip-boost)
+	    skipboostoption="yes" ; shift 2 ;;
+	-sp|--skip-packages)
+	    skippackagesoption="yes" ; shift 2 ;;
+	-q|--quick)
+	    skipboostoption="yes" ; skippackagesoption="yes" ; shift 2 ;;
         --) shift ; break ;;
         *) echo "Internal error!" ; exit 1 ;;
     esac
@@ -52,11 +60,13 @@ done
 # git is required. In the unlikely case it's not yet installed, moving that part of the package install process
 # here to an earlier part of the script:
 
-sudo apt-get update
-if ! command -v git &> /dev/null
-then
-    sudo apt-get install -y git
-fi
+if [ "$skippackagesoption" != "yes" ]; then
+    sudo apt-get update
+    if ! command -v git &> /dev/null
+    then
+        sudo apt-get install -y git
+    fi
+fi 
 
 if [ -n "$1" ]; then
     echo "Library path set to $1. Changing to that directory."
@@ -111,83 +121,109 @@ fi
 
 if git rev-parse --abbrev-ref HEAD | grep master ; then BOOST_BRANCH=master ; else BOOST_BRANCH=develop ; fi
 
+
 echo '==================================> INSTALL'
 
-# already done
-# sudo apt-get update
-sudo apt-get install -y docbook docbook-xml docbook-xsl xsltproc libsaxonhe-java default-jre-headless flex libfl-dev bison unzip rsync wget python3 cmake build-essential
+if [ -z "$skippackagesoption" ]; then
+    # already done
+    # sudo apt-get update
+    sudo apt-get install -y docbook docbook-xml docbook-xsl xsltproc libsaxonhe-java default-jre-headless flex libfl-dev bison unzip rsync wget python3 cmake build-essential
 
-if [ "$typeoption" = "main" ]; then
-    sudo apt-get install -y python3-pip ruby docutils-doc docutils-common python3-docutils
-    sudo gem install asciidoctor --version 1.5.8
-    sudo pip3 install docutils
-fi
+    if [ "$typeoption" = "main" ]; then
+        sudo apt-get install -y python3-pip ruby docutils-doc docutils-common python3-docutils
+        sudo gem install asciidoctor --version 1.5.8
+        sudo pip3 install docutils
+    fi
 
-cd $BOOST_SRC_FOLDER
-cd ..
-mkdir -p tmp && cd tmp
-
-if which doxygen; then
-    echo "doxygen found"
-else
-    echo "building doxygen"
-    if [ ! -d doxygen ]; then git clone -b 'Release_1_8_15' --depth 1 https://github.com/doxygen/doxygen.git && echo "not-cached" ; else echo "cached" ; fi
-    cd doxygen
-    cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release
-    cd build
-    sudo make install
-    cd ../..
-fi
-
-if [ ! -f saxonhe.zip ]; then wget -O saxonhe.zip https://sourceforge.net/projects/saxon/files/Saxon-HE/9.9/SaxonHE9-9-1-4J.zip/download && echo "not-cached" ; else echo "cached" ; fi
-unzip -d saxonhe -o saxonhe.zip
-cd saxonhe
-sudo rm /usr/share/java/Saxon-HE.jar || true
-sudo cp saxon9he.jar /usr/share/java/Saxon-HE.jar
-
-cd $BOOST_SRC_FOLDER
-
-if [ "${BOOSTROOTLIBRARY}" = "yes" ]; then
-    cd ../..
-    git checkout $BOOST_BRANCH
-    git pull
-    export BOOST_ROOT=$(pwd)
-else
+    cd $BOOST_SRC_FOLDER
     cd ..
-    if [ ! -d boost-root ]; then
-        git clone -b $BOOST_BRANCH https://github.com/boostorg/boost.git boost-root --depth 1
-        cd boost-root
-        export BOOST_ROOT=$(pwd)
-        rsync -av $BOOST_SRC_FOLDER/ libs/$REPONAME
+    mkdir -p tmp && cd tmp
+
+    if which doxygen; then
+        echo "doxygen found"
     else
-        cd boost-root
+        echo "building doxygen"
+        if [ ! -d doxygen ]; then git clone -b 'Release_1_8_15' --depth 1 https://github.com/doxygen/doxygen.git && echo "not-cached" ; else echo "cached" ; fi
+        cd doxygen
+        cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release
+        cd build
+        sudo make install
+        cd ../..
+    fi
+
+    if [ ! -f saxonhe.zip ]; then wget -O saxonhe.zip https://sourceforge.net/projects/saxon/files/Saxon-HE/9.9/SaxonHE9-9-1-4J.zip/download && echo "not-cached" ; else echo "cached" ; fi
+    unzip -d saxonhe -o saxonhe.zip
+    cd saxonhe
+    sudo rm /usr/share/java/Saxon-HE.jar || true
+    sudo cp saxon9he.jar /usr/share/java/Saxon-HE.jar
+fi
+
+cd $BOOST_SRC_FOLDER
+
+if [ "$skipboostoption" = "yes" ] ; then
+    # skip-boost was set. A reduced set of actions.
+    if [ "${BOOSTROOTLIBRARY}" = "yes" ]; then
+        cd ../..
+        export BOOST_ROOT=$(pwd)
+    else
+        cd ..
+        if [ ! -d boost-root ]; then
+	    echo "boost-root missing. Rerun this script without --skip-boost or --quick option."
+	    exit 1
+        else
+            cd boost-root
+            export BOOST_ROOT=$(pwd)
+            rsync -av $BOOST_SRC_FOLDER/ libs/$REPONAME
+        fi
+    fi
+else
+    # skip-boost was not set. The standard flow.
+    if [ "${BOOSTROOTLIBRARY}" = "yes" ]; then
+        cd ../..
         git checkout $BOOST_BRANCH
         git pull
         export BOOST_ROOT=$(pwd)
-        rsync -av $BOOST_SRC_FOLDER/ libs/$REPONAME
+    else
+        cd ..
+        if [ ! -d boost-root ]; then
+            git clone -b $BOOST_BRANCH https://github.com/boostorg/boost.git boost-root --depth 1
+            cd boost-root
+            export BOOST_ROOT=$(pwd)
+            rsync -av $BOOST_SRC_FOLDER/ libs/$REPONAME
+        else
+            cd boost-root
+            git checkout $BOOST_BRANCH
+            git pull
+            export BOOST_ROOT=$(pwd)
+            rsync -av $BOOST_SRC_FOLDER/ libs/$REPONAME
+        fi
     fi
 fi
 
-git submodule update --init libs/context
-git submodule update --init tools/boostbook
-git submodule update --init tools/boostdep
-git submodule update --init tools/docca
-git submodule update --init tools/quickbook
+if [ "$skipboostoption" != "yes" ] ; then
 
-if [ "$typeoption" = "main" ]; then
-    git submodule update --init tools/auto_index
-    git submodule update --quiet --init --recursive
+    git submodule update --init libs/context
+    git submodule update --init tools/boostbook
+    git submodule update --init tools/boostdep
+    git submodule update --init tools/docca
+    git submodule update --init tools/quickbook
 
-    # recopy the library as it might have been overwritten
-    rm -rf /tmp/$REPONAME
-    cp -rp libs/$REPONAME /tmp/$REPONAME
-    rsync -av --delete $BOOST_SRC_FOLDER/ libs/$REPONAME
-    # diff -r libs/$REPONAME /tmp/$REPONAME
+    if [ "$typeoption" = "main" ]; then
+        git submodule update --init tools/auto_index
+        git submodule update --quiet --init --recursive
+
+        # recopy the library as it might have been overwritten
+        rm -rf /tmp/$REPONAME
+        cp -rp libs/$REPONAME /tmp/$REPONAME
+        rsync -av --delete $BOOST_SRC_FOLDER/ libs/$REPONAME
+        # diff -r libs/$REPONAME /tmp/$REPONAME
+    fi
+
+    python3 tools/boostdep/depinst/depinst.py ../tools/quickbook
+    ./bootstrap.sh
+    ./b2 headers
+
 fi
-
-python3 tools/boostdep/depinst/depinst.py ../tools/quickbook
-./bootstrap.sh
-./b2 headers
 
 echo '==================================> COMPILE'
 
