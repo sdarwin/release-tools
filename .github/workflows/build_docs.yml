@@ -1,0 +1,146 @@
+# Copyright 2022 Sam Darwin
+#
+# Distributed under the Boost Software License, Version 1.0.
+# (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
+
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - develop
+      - feature/**
+
+env: ""
+
+jobs:
+  linux:
+    defaults:
+      run:
+        shell: bash
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            container: ubuntu:22.04
+          - os: ubuntu-latest
+            container: ubuntu:20.04
+
+    timeout-minutes: 120
+    runs-on: ${{matrix.os}}
+    container: ${{matrix.container}}
+
+    steps:
+
+      - uses: actions/checkout@v2
+
+      - name: job1
+        run: |
+            set -e
+            cp build_docs/linuxdocs.sh /usr/local/bin/
+
+            mkdir -p /opt/github/boostorg
+            cd /opt/github/boostorg
+            git clone -b "develop" --depth 1 "https://github.com/boostorg/boost.git"
+            cd boost
+            git submodule update --init
+
+            # Run at least one full build that installs everything
+            cd libs/system
+            linuxdocs.sh
+            cd ../..
+
+            # For the rest --quick
+            git submodule foreach linuxdocs.sh --quick
+
+  macos:
+    defaults:
+      run:
+        shell: bash
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+
+    timeout-minutes: 120
+    runs-on: ${{matrix.os}}
+
+    steps:
+
+      - uses: actions/checkout@v2
+
+      - name: job
+        run: |
+            set -e
+            cp build_docs/macosdocs.sh /usr/local/bin/
+
+            mkdir -p /opt/github/boostorg
+            cd /opt/github/boostorg
+            git clone -b "develop" --depth 1 "https://github.com/boostorg/boost.git"
+            cd boost
+            git submodule update --init
+
+            # Run at least one full build that installs everything
+            cd libs/system
+            macosdocs.sh
+            cd ../..
+
+            # For the rest --quick
+            git submodule foreach macosdocs.sh --quick
+
+  windows:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-2019
+          - os: windows-2022
+
+    runs-on: ${{matrix.os}}
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: job
+        shell: powershell
+        run: |
+
+            function Run-Windowsdocs {
+                pwd
+                windowsdocs.ps1
+                if ( ! $LASTEXITCODE -eq 0)  {
+                    echo "doc build failed in github actions. exiting."
+                    exit 1 
+                }
+            }
+            function Run-Windowsdocs-Quick {
+                pwd
+                windowsdocs.ps1 --quick
+                if ( ! $LASTEXITCODE -eq 0)  {
+                    echo "doc build failed in github actions. exiting."
+                    exit 1
+                }
+            }
+
+            cp build_docs/windowsdocs.sh C:\windows\system32
+            echo "job"
+            mkdir C:\opt\github\boostorg
+            cd C:\opt\github\boostorg
+            git clone -b develop --depth 1 https://github.com/boostorg/boost.git boost
+            cd boost
+            git submodule update --init
+
+            # Run at least one full build that installs everything
+            cd libs/system
+            Run-Windowsdocs
+            cd ../..
+
+            # For the rest --quick
+            git submodule foreach Run-Windowsdocs-Quick
+
