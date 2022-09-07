@@ -178,6 +178,10 @@ if [ "$skippackagesoption" != "yes" ]; then
         pip3 install --user Sphinx==1.5.6
         pip3 install --user sphinx-boost==0.0.3
         pip3 install --user -c constraints.txt git+https://github.com/rtfd/recommonmark@50be4978d7d91d0b8a69643c63450c8cd92d1212
+
+        # Locking the version numbers in place offers a better guarantee of a known, good build.
+	# At the same time, it creates a perpetual outstanding task, to upgrade the gem and pip versions
+        # because they are out-of-date. When upgrading everything check the Dockerfiles and the other build scripts.
     fi
 
     cd $BOOST_SRC_FOLDER
@@ -288,6 +292,6 @@ if [ "${BOOSTROOTLIBRARY}" = "yes" ]; then
     echo ""
 else
     echo ""
-    echo "Build completed. Check the ../boost-root/libs/${REPONAME}/doc directory."
+    echo "Build completed. Check the $BOOST_SRC_FOLDER/../boost-root/libs/${REPONAME}/doc directory."
     echo ""
 fi

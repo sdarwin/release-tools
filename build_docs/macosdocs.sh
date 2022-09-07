@@ -9,9 +9,31 @@ set -e
 
 scriptname="macosdocs.sh"
 
+# git and getopt are required. If they are not installed, moving that part of the installation process
+# to an earlier part of the script:
+if ! command -v brew &> /dev/null
+then
+    echo "Installing brew. Check the instructions that are shown."
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+fi
+
+if ! command -v git &> /dev/null
+then
+    echo "Installing git"
+    brew install git
+fi
+
+# check apple silicon.
+if ! command -v /usr/local/opt/gnu-getopt/bin/getopt &> /dev/null
+then
+    echo "Installing gnu-getopt"
+    brew install gnu-getopt
+fi
+export PATH="/usr/local/opt/gnu-getopt/bin:$PATH"
+
 # READ IN COMMAND-LINE OPTIONS
 
-TEMP=`getopt -o t:,h::,sb::,sp::,q:: --long type:,help::,skip-boost::,skip-packages::,quick:: -- "$@"`
+TEMP=`/usr/local/opt/gnu-getopt/bin/getopt -o t:,h::,sb::,sp::,q:: --long type:,help::,skip-boost::,skip-packages::,quick:: -- "$@"`
 eval set -- "$TEMP"
 
 # extract options and their arguments into variables.
@@ -57,21 +79,8 @@ standard arguments:
     esac
 done
 
-# git is required. In the unlikely case it's not yet installed, moving that part of the package install process
+# git and getopt are required. In the unlikely case it's not yet installed, moving that part of the package install process
 # here to an earlier part of the script:
-
-if [ "$skippackagesoption" != "yes" ]; then
-    if ! command -v brew &> /dev/null
-    then
-        echo "Installing brew. Check the instructions that are shown."
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    fi
-    
-    if ! command -v git &> /dev/null
-    then
-        brew install git
-    fi
-fi
 
 if [ -n "$1" ]; then
     echo "Library path set to $1. Changing to that directory."
@@ -139,21 +148,25 @@ if [ "$skippackagesoption" != "yes" ]; then
     brew install docbook-xsl
     
     if [ "$typeoption" = "main" ]; then
-        gem install asciidoctor --version 2.0.16
-        pip3 install docutils
+        sudo gem install asciidoctor --version 2.0.16
+        pip3 install docutils --user
 	# Is rapidxml required? It is downloading to the local directory.
         # wget -O rapidxml.zip http://sourceforge.net/projects/rapidxml/files/latest/download
         # unzip -n -d rapidxml rapidxml.zip
         pip3 install --user https://github.com/bfgroup/jam_pygments/archive/master.zip
         pip3 install --user Jinja2==2.11.2
         pip3 install --user MarkupSafe==1.1.1
-        gem install pygments.rb --version 2.1.0
+        sudo gem install pygments.rb --version 2.1.0
         pip3 install --user Pygments==2.2.0
         sudo gem install rouge --version 3.26.1
         echo "Sphinx==1.5.6" > constraints.txt
         pip3 install --user Sphinx==1.5.6
         pip3 install --user sphinx-boost==0.0.3
-        pip3 install --user -c /root/build/constraints.txt git+https://github.com/rtfd/recommonmark@50be4978d7d91d0b8a69643c63450c8cd92d1212
+        pip3 install --user -c constraints.txt git+https://github.com/rtfd/recommonmark@50be4978d7d91d0b8a69643c63450c8cd92d1212
+
+        # Locking the version numbers in place offers a better guarantee of a known, good build.
+        # At the same time, it creates a perpetual outstanding task, to upgrade the gem and pip versions
+        # because they are out-of-date. When upgrading everything check the Dockerfiles and the other build scripts.
     fi
     
     # an alternate set of packages from https://www.boost.org/doc/libs/develop/doc/html/quickbook/install.html
@@ -262,6 +275,6 @@ if [ "${BOOSTROOTLIBRARY}" = "yes" ]; then
     echo ""
 else
     echo ""
-    echo "Build completed. Check the ../boost-root/libs/${REPONAME}/doc directory."
+    echo "Build completed. Check the $BOOST_SRC_FOLDER/../boost-root/libs/${REPONAME}/doc directory."
     echo ""
 fi
