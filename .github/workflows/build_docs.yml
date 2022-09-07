@@ -13,8 +13,6 @@ on:
       - develop
       - feature/**
 
-env: ""
-
 jobs:
   linux:
     defaults:
