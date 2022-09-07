@@ -288,7 +288,7 @@ if ( ${skip-boost} ) {
         cd ..
         if ( -Not (Test-Path -Path "boost-root") ) {
             echo "boost-root missing. Rerun this script without the -skip-boost or -quick option."
-            exit(1)
+            exit 1
 	    }
         else {
             cd boost-root
@@ -380,12 +380,20 @@ if ($typeoption -eq "main") {
     $filename="$Env:BOOST_ROOT\tools\build\src\user-config.jam"
     [IO.File]::WriteAllLines($filename, $content)
     ./b2 libs/$REPONAME/doc/
+     if ( ! $LASTEXITCODE -eq 0)  {
+         echo "doc build failed. exiting."
+         exit 1
+     }
 }
 elseif ($typeoption -eq "cppal") {
     $content="using doxygen : `"/Program Files/doxygen/bin/doxygen.exe`" ; using boostbook ; using saxonhe ;"
     $filename="$Env:BOOST_ROOT\tools\build\src\user-config.jam"
     [IO.File]::WriteAllLines($filename, $content)
     ./b2 libs/$REPONAME/doc/
+     if ( ! $LASTEXITCODE -eq 0)  {
+         echo "doc build failed. exiting."
+         exit 1
+     }
 }
 
 if ($BOOSTROOTLIBRARY -eq "yes") {
