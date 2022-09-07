@@ -275,6 +275,6 @@ if [ "${BOOSTROOTLIBRARY}" = "yes" ]; then
     echo ""
 else
     echo ""
-    echo "Build completed. Check the $BOOST_SRC_FOLDER/../boost-root/libs/${REPONAME}/doc directory."
+    echo "Build completed. Check the results in $BOOST_SRC_FOLDER/../boost-root/libs/${REPONAME}/doc"
     echo ""
 fi
