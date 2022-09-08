@@ -148,11 +148,12 @@ if [ "$skippackagesoption" != "yes" ]; then
     brew install docbook-xsl
     
     if [ "$typeoption" = "main" ]; then
+	brew install ghostscript
+	brew install texlive 
         sudo gem install asciidoctor --version 2.0.16
         pip3 install docutils --user
-	# Is rapidxml required? It is downloading to the local directory.
-        # wget -O rapidxml.zip http://sourceforge.net/projects/rapidxml/files/latest/download
-        # unzip -n -d rapidxml rapidxml.zip
+        wget -O rapidxml.zip http://sourceforge.net/projects/rapidxml/files/latest/download
+        unzip -n -d rapidxml rapidxml.zip
         pip3 install --user https://github.com/bfgroup/jam_pygments/archive/master.zip
         pip3 install --user Jinja2==2.11.2
         pip3 install --user MarkupSafe==1.1.1
@@ -257,7 +258,27 @@ if [ "$skipboostoption" != "yes" ] ; then
 
 fi
 
+# Update path
+
+if [[ ! $PATH =~ \.local/bin ]]; then
+    export PATH=~/.local/bin:$PATH
+fi
+
 echo '==================================> COMPILE'
+
+# exceptions:
+
+if [ ! -d libs/$REPONAME/doc ]; then
+    echo "doc/ folder is missing for this library. No need to compile. Exiting."
+    exit 0
+fi
+
+if [ "$REPONAME" = "geometry" ]; then
+    ./b2 libs/$REPONAME/doc/src/docutils/tools/doxygen_xml2qbk
+    cp dist/bin/doxygen_xml2qbk /usr/local/bin/
+fi
+
+# the main compilation:
 
 if [ "$typeoption" = "main" ]; then
     ./b2 -q -d0 --build-dir=build --distdir=build/dist tools/quickbook tools/auto_index/build

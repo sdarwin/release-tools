@@ -1,6 +1,6 @@
 ## Building the documentation for specific boost libraries
 
-Each boost libraries contains documentation in the doc/ folder. For example, https://github.com/boostorg/core has documentation in core/doc/. The format is generally [Quickbook](https://www.boost.org/doc/libs/master/doc/html/quickbook.html) and needs to be compiled into html. The scripts here accomplish that.
+Each boost libraries contains documentation in the doc/ folder. For example, https://github.com/boostorg/core has documentation in core/doc/. The format is generally [quickbook](https://www.boost.org/doc/libs/master/doc/html/quickbook.html) and needs to be compiled into html. The scripts here accomplish that.
 
 There are different possible configurations when building the docs:
 

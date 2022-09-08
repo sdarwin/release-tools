@@ -134,21 +134,21 @@ echo '==================================> INSTALL'
 #         docutils-common 	ALREADY THERE
 #         docutils-doc 		ALREADY THERE
 #         flex 			ALREADY THERE
-#         xsltproc 		ALREADY THERE
-#         openssh-client 	UNCLEAR. MIGHT LEAVE OUT.
+#         ghostscript 		ADD HERE 2022-09-07. Need binary gs in boostorg/accumulators and presumably others.
 #         git 			ALREADY THERE
-#         graphviz		TO ADD boost/graph or graph_parallel might need it.
-#         texlive		TO ADD 
+#         graphviz		likely needs to be added. boost/graph or graph_parallel might need it.
+#         texlive		ADD HERE 2022-09-07. Need the binaries latex and dvips in boostorg/accumulators and presumably others.
 #         sshpass 		UNCLEAR. MIGHT LEAVE OUT.
-#         ghostscript 		TO ADD?
+#         openssh-client 	UNCLEAR. MIGHT LEAVE OUT.
 #         unzip 		ALREADY THERE	
 #         wget 			ALREADY THERE
-#         p7zip-full  		IF THIS IS NEEDED TO BUILD THE BUNDLE, can leave out.
+#         p7zip-full  		IF THIS IS ONLY NEEDED TO BUILD THE BUNDLE, can leave out.
 #         python3-pip 		ALREADY THERE
 #         ruby			ALREADY THERE 
 #         python3-docutils	ALREADY THERE 
 #         libsaxonhe-java 	ALREADY THERE
-#         texlive-latex-extra 	TO ADD?
+#         texlive-latex-extra 	ADD HERE 2022-09-07. Need the binaries latex and dvips in boostorg/accumulators and presumably others.
+#         xsltproc 		ALREADY THERE
 
 if [ "$skippackagesoption" != "yes" ]; then
 
@@ -162,12 +162,11 @@ if [ "$skippackagesoption" != "yes" ]; then
     fi 
     if [ "$typeoption" = "main" ]; then
         sudo apt-get install -y python3-pip ruby
-        sudo apt-get install -y bison docbook docbook-xml docbook-xsl docutils-doc docutils-common flex libfl-dev libsaxonhe-java python3-docutils xsltproc
+        sudo apt-get install -y bison docbook docbook-xml docbook-xsl docutils-doc docutils-common flex ghostscript libfl-dev libsaxonhe-java python3-docutils texlive texlive-latex-extra xsltproc
         sudo gem install asciidoctor --version 2.0.16
         sudo pip3 install docutils
-        # Is rapidxml required? It is downloading to the local directory.
-        # wget -O rapidxml.zip http://sourceforge.net/projects/rapidxml/files/latest/download
-        # unzip -n -d rapidxml rapidxml.zip
+        wget -O rapidxml.zip http://sourceforge.net/projects/rapidxml/files/latest/download
+        unzip -n -d rapidxml rapidxml.zip
         pip3 install --user https://github.com/bfgroup/jam_pygments/archive/master.zip
         pip3 install --user Jinja2==2.11.2
         pip3 install --user MarkupSafe==1.1.1
@@ -274,7 +273,27 @@ if [ "$skipboostoption" != "yes" ] ; then
 
 fi
 
+# Update path
+
+if [[ ! $PATH =~ \.local/bin ]]; then
+    export PATH=~/.local/bin:$PATH
+fi
+
 echo '==================================> COMPILE'
+
+# exceptions:
+
+if [ ! -d libs/$REPONAME/doc ]; then
+    echo "doc/ folder is missing for this library. No need to compile. Exiting."
+    exit 0
+fi
+
+if [ "$REPONAME" = "geometry" ]; then
+    ./b2 libs/$REPONAME/doc/src/docutils/tools/doxygen_xml2qbk
+    cp dist/bin/doxygen_xml2qbk /usr/local/bin/
+fi
+
+# the main compilation:
 
 if [ "$typeoption" = "main" ]; then
     ./b2 -q -d0 --build-dir=build --distdir=build/dist tools/quickbook tools/auto_index/build

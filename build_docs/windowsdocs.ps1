@@ -55,7 +55,7 @@ if ( -Not ${skip-packages} ) {
     
     if ( -Not (Get-Command git -errorAction SilentlyContinue) ) {
         echo "Install git"
-        choco install -y git
+        choco install -y --no-progress git
     }
 
     # Make `refreshenv` available right away, by defining the $env:ChocolateyInstall
@@ -165,30 +165,35 @@ if ( -Not ${skip-packages} ) {
         iex ((new-object net.webclient).DownloadString('https://chocolatey.org/install.ps1'))
     }
     
-    choco install -y rsync sed doxygen.install xsltproc docbook-bundle
+    choco install -y --no-progress rsync sed doxygen.install xsltproc docbook-bundle
     
     if ( -Not (Get-Command java -errorAction SilentlyContinue) )
     {
-        choco install -y openjdk --version=17.0.1
+        choco install -y --no-progress openjdk --version=17.0.1
     }
     
     if ( -Not (Get-Command python -errorAction SilentlyContinue) )
     {
-        choco install -y python3
+        choco install -y --no-progress python3
     }
     
     if ( -Not (Get-Command git -errorAction SilentlyContinue) )
     {
-        choco install -y git
+        choco install -y --no-progress git
     }
     
     if ($typeoption -eq "main") {
     if ( -Not (Get-Command ruby -errorAction SilentlyContinue) )
     {
-        choco install -y ruby
+        choco install -y --no-progress ruby
+    }
+
+    if ( -Not (Get-Command wget -errorAction SilentlyContinue) )
+    {   
+        choco install -y --no-progress wget
     }
     }
-    
+
     # Make `refreshenv` available right away, by defining the $env:ChocolateyInstall
     # variable and importing the Chocolatey profile module.
     # Note: Using `. $PROFILE` instead *may* work, but isn't guaranteed to.
@@ -198,23 +203,35 @@ if ( -Not ${skip-packages} ) {
     refreshenv
     
     if ($typeoption -eq "main") {
+        $ghostversion="9.56.1"
+        choco install --no-progress ghostscript --version $ghostversion
+        choco install --no-progress texlive
         gem install asciidoctor --version 2.0.16
         pip install docutils
-        $pattern = '[\\/]'
-        $asciidoctorpath=(get-command asciidoctor).Path -replace $pattern, '/'
-        # Is rapidxml required? It is downloading to the local directory.
-        # wget -O rapidxml.zip http://sourceforge.net/projects/rapidxml/files/latest/download
-        # unzip -n -d rapidxml rapidxml.zip
-        pip3 install --user https://github.com/bfgroup/jam_pygments/archive/master.zip
-        pip3 install --user Jinja2==2.11.2
-        pip3 install --user MarkupSafe==1.1.1
+        wget -O rapidxml.zip http://sourceforge.net/projects/rapidxml/files/latest/download
+        unzip -n -d rapidxml rapidxml.zip
+        #
+        # pip3 had been using --user. what will happen without.
+        pip3 install https://github.com/bfgroup/jam_pygments/archive/master.zip
+        pip3 install Jinja2==2.11.2
+        pip3 install MarkupSafe==1.1.1
         gem install pygments.rb --version 2.1.0
-        pip3 install --user Pygments==2.2.0
-        sudo gem install rouge --version 3.26.1
+        pip3 install Pygments==2.2.0
+        gem install rouge --version 3.26.1
         echo "Sphinx==1.5.6" > constraints.txt
-        pip3 install --user Sphinx==1.5.6
-        pip3 install --user sphinx-boost==0.0.3
-        pip3 install --user -c constraints.txt git+https://github.com/rtfd/recommonmark@50be4978d7d91d0b8a69643c63450c8cd92d1212
+        pip3 install Sphinx==1.5.6
+        pip3 install sphinx-boost==0.0.3
+        pip3 install -c constraints.txt git+https://github.com/rtfd/recommonmark@50be4978d7d91d0b8a69643c63450c8cd92d1212
+
+        refreshenv
+
+	# ghostscript fixes
+        $newpathitem="C:\Program Files\gs\gs$ghostversion\bin"
+        if( (Test-Path -Path $newpathitem) -and -Not ( $env:Path -like "*$newpathitem*"))
+        {
+               $env:Path += ";$newpathitem"
+        }
+        New-Item -ItemType SymbolicLink -Path "C:\Program Files\gs\gs9.56.1\bin\gswin32c.exe" -Target "C:\Program Files\gs\gs9.56.1\bin\gswin64c.exe"
 
         # Locking the version numbers in place offers a better guarantee of a known, good build.
         # At the same time, it creates a perpetual outstanding task, to upgrade the gem and pip versions
@@ -354,11 +371,17 @@ if ( -Not ${skip-boost} ) {
     if ($typeoption -eq "main") {
         git submodule update --init tools/auto_index
         git submodule update --quiet --init --recursive
-    
-        # recopy the library as it might have been overwritten
-        Copy-Item -Path $BOOST_SRC_FOLDER\* -Destination libs\$REPONAME\ -Recurse -Force
     }
-    
+
+    # Recopy the library, as it might have been overwritten by the submodule updates that just occurred.
+    if ( -Not ($BOOSTROOTLIBRARY -eq "yes") ) {
+        if (Test-Path -Path "libs\$REPONAME")
+        {
+            rmdir libs\$REPONAME -Force -Recurse
+        }
+        Copy-Item -Path $BOOST_SRC_FOLDER -Destination libs\$REPONAME -Recurse -Force
+    }
+
     $matcher='\.saxonhe_jar = \$(jar\[1\]) ;$'
     $replacer='.saxonhe_jar = $(jar[1]) ;  .saxonhe_jar = \"/usr/share/java/Saxon-HE.jar\" ;'
     sed -i "s~$matcher~$replacer~" tools/build/src/tools/saxonhe.jam
@@ -374,7 +397,24 @@ if ( -Not ${skip-boost} ) {
 
 echo '==================================> COMPILE'
 
+# exceptions:
+
+if ( -Not (Test-Path -Path libs/$REPONAME/doc/ )) {
+    echo "doc/ folder is missing for this library. No need to compile. Exiting."
+    exit 0
+}
+
+if ("$REPONAME" -eq "geometry") {
+    ./b2 libs/$REPONAME/doc/src/docutils/tools/doxygen_xml2qbk
+    cp dist/bin/doxygen_xml2qbk C:\windows\system32
+}
+
+# the main compilation:
+
 if ($typeoption -eq "main") {
+
+    $asciidoctorpath=(get-command asciidoctor).Path -replace '\\', '/'
+
     ./b2 -q -d0 --build-dir=build --distdir=build/dist tools/quickbook tools/auto_index/build
     $content="using quickbook : build/dist/bin/quickbook ; using auto-index : build/dist/bin/auto_index ; using docutils ; using doxygen : `"/Program Files/doxygen/bin/doxygen.exe`" ; using boostbook ; using asciidoctor : `"$asciidoctorpath`" ; using saxonhe ;"
     $filename="$Env:BOOST_ROOT\tools\build\src\user-config.jam"
