@@ -81,8 +81,6 @@ ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US.UTF-8
 
 # To maintain consistency between the Dockerfile and the build_docs scripts, in the next future revision of the Dockerfile
-# install and keep track of these gems also.
-# gem install public_suffix --version 4.0.7          # 4.0.7 from 2022 still supports ruby 2.5. Continue to use until ~2024.
-# gem install css_parser --version 1.12.0            # 1.12.0 from 2022 still supports ruby 2.5. Continue to use until ~2024.
-# However, Jinja 3.1.0 and later have dropped support for Python 3.6. Meaning the totality of these packages won't run on Ubuntu 18.04 anymore.
-# So it becomes less important to maintain longer term compatible versions of any other gems such as public_suffix and css_parser.
+# install, track, and upgrade these gems also.
+# gem install public_suffix --version 4.0.7
+# gem install css_parser --version 1.12.0
