@@ -199,7 +199,7 @@ if [ "$skippackagesoption" != "yes" ]; then
         echo "doxygen found"
     else
         echo "building doxygen"
-        if [ ! -d doxygen ]; then git clone -b 'Release_1_9_15' --depth 1 https://github.com/doxygen/doxygen.git && echo "not-cached" ; else echo "cached" ; fi
+        if [ ! -d doxygen ]; then git clone -b 'Release_1_9_5' --depth 1 https://github.com/doxygen/doxygen.git && echo "not-cached" ; else echo "cached" ; fi
         cd doxygen
         cmake -H. -Bbuild -DCMAKE_BUILD_TYPE=Release
         cd build
