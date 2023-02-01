@@ -37,10 +37,6 @@ jobs:
             packages: python
             skiplist: auto_index leaf qvm static_string
           - os: ubuntu-latest
-            container: ubuntu:18.04
-            packages: python
-            skiplist: auto_index leaf qvm static_string
-          - os: ubuntu-latest
             container: ubuntu:22.04
             packages: python2
             skiplist: auto_index hof static_string
@@ -50,12 +46,7 @@ jobs:
             packages: python
             skiplist: auto_index static_string
             flags: "--boostrelease"
-          - os: ubuntu-latest
-            container: ubuntu:18.04
-            packages: python
-            skiplist: auto_index static_string
-            flags: "--boostrelease"
-
+            # Jinja 3.1.0 and later have dropped support for Python 3.6 and therefore won't run on Ubuntu 18.04. Removing tests for Ubuntu 18.
 
     timeout-minutes: 720
     runs-on: ${{matrix.os}}
