@@ -79,3 +79,8 @@ RUN apt-get update \
 ENV LC_ALL en_US.UTF-8
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US.UTF-8
+
+# To maintain consistency between the Dockerfile and the build_docs scripts, in the next future revision of the Dockerfile
+# install and keep track of these gems also.
+# gem install public_suffix --version 4.0.7          # 4.0.7 from 2022 still supports ruby 2.5. Continue to use until ~2024.
+# gem install css_parser --version 1.12.0            # 1.12.0 from 2022 still supports ruby 2.5. Continue to use until ~2024.
