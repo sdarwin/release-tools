@@ -31,20 +31,20 @@ jobs:
           - os: ubuntu-latest
             container: ubuntu:22.04
             packages: python2
-            skiplist: auto_index hof leaf qvm static_string
+            # skiplist: auto_index hof leaf qvm static_string
           - os: ubuntu-latest
             container: ubuntu:20.04
             packages: python
-            skiplist: auto_index leaf qvm static_string
+            # skiplist: auto_index leaf qvm static_string
           - os: ubuntu-latest
             container: ubuntu:22.04
             packages: python2
-            skiplist: auto_index hof static_string
+            # skiplist: auto_index hof static_string
             flags: "--boostrelease"
           - os: ubuntu-latest
             container: ubuntu:20.04
             packages: python
-            skiplist: auto_index static_string
+            # skiplist: auto_index static_string
             flags: "--boostrelease"
             # Jinja 3.1.0 and later have dropped support for Python 3.6 and therefore won't run on Ubuntu 18.04. Removing tests for Ubuntu 18.
 
@@ -58,7 +58,8 @@ jobs:
 
       - name: docs
         run: |
-            set -ex
+            set -x
+            # set -e
             apt-get update
             DEBIAN_FRONTEND="noninteractive" apt-get install -y tzdata
             apt-get install -y git sudo
@@ -100,6 +101,11 @@ jobs:
 
             textpart4=${{ matrix.flags }}
             textpart5='
+                if [[ $? != 0 ]]; then
+                    echo "..failed. DOCS BUILD FAILED. LIBRARY $reponame"
+                else
+                    echo "LIBARY $reponame SUCCEEDED."
+                fi
             fi
             '
 
@@ -122,9 +128,9 @@ jobs:
         include:
           - os: macos-latest
             # why is boostorg/test failing
-            skiplist: auto_index hof leaf qvm static_string
+            # skiplist: auto_index hof leaf qvm static_string
           - os: macos-latest
-            skiplist: auto_index hof static_string
+            # skiplist: auto_index hof static_string
             flags: "--boostrelease"
 
     timeout-minutes: 720
@@ -171,6 +177,11 @@ jobs:
             textpart4=${{ matrix.flags }}
 
             textpart5='
+                if [[ $? != 0 ]]; then
+                    echo "..failed. DOCS BUILD FAILED. LIBRARY $reponame"
+                else
+                    echo "LIBARY $reponame SUCCEEDED."
+                fi
             fi
             '
 
