@@ -163,11 +163,10 @@ if [ "$skippackagesoption" != "yes" ]; then
     if [ "$typeoption" = "main" ]; then
         sudo apt-get install -y python3-pip ruby
         sudo apt-get install -y bison docbook docbook-xml docbook-xsl docutils-doc docutils-common flex ghostscript graphviz libfl-dev libsaxonhe-java python3-docutils texlive texlive-latex-extra xsltproc
-	gem install public_suffix
-        sudo gem install asciidoctor --version 2.0.17
         # the next two gems are for asciidoctor-pdf
-        sudo gem install public_suffix
+	sudo gem install public_suffix --version 4.0.7		# 4.0.7 from 2022 still supports ruby 2.5. Continue to use until ~2024.
         sudo gem install css_parser
+        sudo gem install asciidoctor --version 2.0.17
 	sudo gem install asciidoctor-pdf
         sudo pip3 install docutils
         # which library is using rapidxml

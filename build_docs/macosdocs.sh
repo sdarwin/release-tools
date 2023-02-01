@@ -177,7 +177,7 @@ if [ "$skippackagesoption" != "yes" ]; then
 	brew install ghostscript
 	brew install texlive
         brew install graphviz
-	sudo gem install public_suffix
+        sudo gem install public_suffix --version 4.0.7               # 4.0.7 from 2022 still supports ruby 2.5. Continue to use until ~2024.
         sudo gem install asciidoctor
         sudo gem install asciidoctor-pdf
         pip3 install docutils --user
