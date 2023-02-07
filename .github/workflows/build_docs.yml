@@ -116,8 +116,8 @@ jobs:
             chmod 755 /usr/local/bin/runlinuxdocsquick
             echo "checking runlinuxdocsquick"
             cat /usr/local/bin/runlinuxdocsquick
+            # https://github.com/boostorg/accumulators.git
             allrepos="
-            https://github.com/boostorg/accumulators.git
             https://github.com/boostorg/algorithm.git
             https://github.com/boostorg/align.git
             https://github.com/boostorg/any.git
