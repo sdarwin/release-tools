@@ -7,6 +7,7 @@
 
 set -e
 shopt -s extglob
+shopt -s dotglob
 
 scriptname="linuxdocs.sh"
 
