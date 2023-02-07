@@ -92,8 +92,8 @@ jobs:
             textpart3='"
             # jump ahead to continue testing
 
-            if [[ "$reponame" =~ ^[a-r] ]]; then
-            # if [[ "$reponame" =~ ^[9] ]]; then
+            # if [[ "$reponame" =~ ^[a-r] ]]; then
+            if [[ "$reponame" =~ ^[9] ]]; then
                echo "skipping ahead X letters"
             elif [[ "$skiplist" =~ $reponame ]]; then
                 echo "repo in skiplist"
