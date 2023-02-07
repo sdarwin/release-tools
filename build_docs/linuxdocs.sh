@@ -318,8 +318,11 @@ if [ "$skipboostoption" != "yes" ] ; then
         fi
     fi
 
+    echo "Running depinst.py quickbook"
     python3 tools/boostdep/depinst/depinst.py ../tools/quickbook
+    echo "Running bootstrap.sh"
     ./bootstrap.sh
+    echo "Running ./b2 headers"
     ./b2 headers
 
 fi
