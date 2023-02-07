@@ -116,61 +116,62 @@ jobs:
             chmod 755 /usr/local/bin/runlinuxdocsquick
             echo "checking runlinuxdocsquick"
             cat /usr/local/bin/runlinuxdocsquick
-            #             allrepos="
-            # https://github.com/boostorg/accumulators.git
-            # https://github.com/boostorg/algorithm.git
-            # https://github.com/boostorg/align.git
-            # https://github.com/boostorg/any.git
-            # https://github.com/boostorg/array.git
-            # https://github.com/boostorg/asio.git
-            # https://github.com/boostorg/assert.git
-            # https://github.com/boostorg/assign.git
-            # https://github.com/boostorg/atomic.git
-            # https://github.com/boostorg/auto_index.git
-            # https://github.com/boostorg/bcp.git
-            # https://github.com/boostorg/beast.git
-            # https://github.com/boostorg/bimap.git
-            # https://github.com/boostorg/bind.git
-            # https://github.com/boostorg/boostbook.git
-            # https://github.com/boostorg/boostdep.git
-            # https://github.com/boostorg/boost_install.git
-            # https://github.com/boostorg/build.git
-            # https://github.com/boostorg/callable_traits.git
-            # https://github.com/boostorg/check_build.git
-            # https://github.com/boostorg/chrono.git
-            # https://github.com/boostorg/circular_buffer.git
-            # https://github.com/boostorg/cmake.git
-            # https://github.com/boostorg/compatibility.git
-            # https://github.com/boostorg/compute.git
-            # https://github.com/boostorg/concept_check.git
-            # https://github.com/boostorg/config.git
-            # https://github.com/boostorg/container.git
-            # https://github.com/boostorg/container_hash.git
-            # https://github.com/boostorg/context.git
-            # https://github.com/boostorg/contract.git
-            # https://github.com/boostorg/conversion.git
-            # https://github.com/boostorg/convert.git
-            # https://github.com/boostorg/core.git
-            # https://github.com/boostorg/coroutine2.git
-            # https://github.com/boostorg/coroutine.git
-            # https://github.com/boostorg/crc.git
-            # https://github.com/boostorg/date_time.git
-            # https://github.com/boostorg/describe.git
-            # https://github.com/boostorg/detail.git
-            # https://github.com/boostorg/dll.git
-            # https://github.com/boostorg/docca.git
-            # https://github.com/boostorg/dynamic_bitset.git
-            # https://github.com/boostorg/endian.git
-            # https://github.com/boostorg/exception.git
-            # https://github.com/boostorg/fiber.git
-            # https://github.com/boostorg/filesystem.git
-            # https://github.com/boostorg/flyweight.git
-            # https://github.com/boostorg/foreach.git
-            # https://github.com/boostorg/format.git
-            # https://github.com/boostorg/functional.git
-            # https://github.com/boostorg/function.git
-            # https://github.com/boostorg/function_types.git
-            # https://github.com/boostorg/fusion.git
+            allrepos="
+            https://github.com/boostorg/accumulators.git
+            https://github.com/boostorg/algorithm.git
+            https://github.com/boostorg/align.git
+            https://github.com/boostorg/any.git
+            https://github.com/boostorg/array.git
+            https://github.com/boostorg/asio.git
+            https://github.com/boostorg/assert.git
+            https://github.com/boostorg/assign.git
+            https://github.com/boostorg/atomic.git
+            https://github.com/boostorg/auto_index.git
+            https://github.com/boostorg/bcp.git
+            https://github.com/boostorg/beast.git
+            https://github.com/boostorg/bimap.git
+            https://github.com/boostorg/bind.git
+            https://github.com/boostorg/boostbook.git
+            https://github.com/boostorg/boostdep.git
+            https://github.com/boostorg/boost_install.git
+            https://github.com/boostorg/build.git
+            https://github.com/boostorg/callable_traits.git
+            https://github.com/boostorg/check_build.git
+            https://github.com/boostorg/chrono.git
+            https://github.com/boostorg/circular_buffer.git
+            https://github.com/boostorg/cmake.git
+            https://github.com/boostorg/compatibility.git
+            https://github.com/boostorg/compute.git
+            https://github.com/boostorg/concept_check.git
+            https://github.com/boostorg/config.git
+            https://github.com/boostorg/container.git
+            https://github.com/boostorg/container_hash.git
+            https://github.com/boostorg/context.git
+            https://github.com/boostorg/contract.git
+            https://github.com/boostorg/conversion.git
+            https://github.com/boostorg/convert.git
+            https://github.com/boostorg/core.git
+            https://github.com/boostorg/coroutine2.git
+            https://github.com/boostorg/coroutine.git
+            https://github.com/boostorg/crc.git
+            https://github.com/boostorg/date_time.git
+            https://github.com/boostorg/describe.git
+            https://github.com/boostorg/detail.git
+            https://github.com/boostorg/dll.git
+            https://github.com/boostorg/docca.git
+            https://github.com/boostorg/dynamic_bitset.git
+            https://github.com/boostorg/endian.git
+            https://github.com/boostorg/exception.git
+            https://github.com/boostorg/fiber.git
+            https://github.com/boostorg/filesystem.git
+            https://github.com/boostorg/flyweight.git
+            https://github.com/boostorg/foreach.git
+            https://github.com/boostorg/format.git
+            https://github.com/boostorg/functional.git
+            https://github.com/boostorg/function.git
+            https://github.com/boostorg/function_types.git
+            https://github.com/boostorg/fusion.git
+            "
             # https://github.com/boostorg/geometry.git
             # https://github.com/boostorg/gil.git
             # https://github.com/boostorg/graph.git
@@ -254,31 +255,30 @@ jobs:
             # https://github.com/boostorg/stl_interfaces.git
             # https://github.com/boostorg/system.git
             # https://github.com/boostorg/test.git
-            allrepos="
-            https://github.com/boostorg/thread.git
-            https://github.com/boostorg/throw_exception.git
-            https://github.com/boostorg/timer.git
-            https://github.com/boostorg/tokenizer.git
-            https://github.com/boostorg/tti.git
-            https://github.com/boostorg/tuple.git
-            https://github.com/boostorg/type_erasure.git
-            https://github.com/boostorg/type_index.git
-            https://github.com/boostorg/typeof.git
-            https://github.com/boostorg/type_traits.git
-            https://github.com/boostorg/ublas.git
-            https://github.com/boostorg/units.git
-            https://github.com/boostorg/unordered.git
-            https://github.com/boostorg/url.git
-            https://github.com/boostorg/utility.git
-            https://github.com/boostorg/uuid.git
-            https://github.com/boostorg/variant2.git
-            https://github.com/boostorg/variant.git
-            https://github.com/boostorg/vmd.git
-            https://github.com/boostorg/wave.git
-            https://github.com/boostorg/winapi.git
-            https://github.com/boostorg/xpressive.git
-            https://github.com/boostorg/yap.git
-            "
+            # https://github.com/boostorg/thread.git
+            # https://github.com/boostorg/throw_exception.git
+            # https://github.com/boostorg/timer.git
+            # https://github.com/boostorg/tokenizer.git
+            # https://github.com/boostorg/tti.git
+            # https://github.com/boostorg/tuple.git
+            # https://github.com/boostorg/type_erasure.git
+            # https://github.com/boostorg/type_index.git
+            # https://github.com/boostorg/typeof.git
+            # https://github.com/boostorg/type_traits.git
+            # https://github.com/boostorg/ublas.git
+            # https://github.com/boostorg/units.git
+            # https://github.com/boostorg/unordered.git
+            # https://github.com/boostorg/url.git
+            # https://github.com/boostorg/utility.git
+            # https://github.com/boostorg/uuid.git
+            # https://github.com/boostorg/variant2.git
+            # https://github.com/boostorg/variant.git
+            # https://github.com/boostorg/vmd.git
+            # https://github.com/boostorg/wave.git
+            # https://github.com/boostorg/winapi.git
+            # https://github.com/boostorg/xpressive.git
+            # https://github.com/boostorg/yap.git
+            # 
             # "full" install at least with packages
             firstrepo="https://github.com/boostorg/accumulators.git"
             git clone $firstrepo
