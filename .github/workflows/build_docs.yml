@@ -294,7 +294,7 @@ jobs:
                 git clone $repo
                 reposhortname=$(basename -s .git $repo)
                 cd ${reposhortname}
-                runlinuxdocsquick
+                runlinuxdocsquick ${reposhortname}
                 pwd
                 cd ..
                 pwd

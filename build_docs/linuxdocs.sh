@@ -6,6 +6,7 @@
 # (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
 
 set -e
+set -x
 shopt -s extglob
 shopt -s dotglob
 
@@ -307,9 +308,11 @@ if [ "$skipboostoption" != "yes" ] ; then
     git submodule update --init tools/quickbook
 
     if [ "$typeoption" = "main" ]; then
-        git submodule update --init libs/format
-        git submodule update --init libs/range
+        # git submodule update --init libs/format
+        # git submodule update --init libs/range
         git submodule update --init tools/auto_index
+        echo "Running depinst.py quickbook"
+        python3 tools/boostdep/depinst/depinst.py ../tools/auto_index
         # testing this section
         # git submodule update --quiet --init --recursive
 
