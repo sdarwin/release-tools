@@ -320,7 +320,9 @@ if [ "$skipboostoption" != "yes" ] ; then
         git submodule update --quiet --init --recursive
 
         # recopy the library as it might have been overwritten
-	cp -r ${BOOST_SRC_FOLDER}/!(boost-root) ${librarypath}
+        if [ ! "${BOOSTROOTLIBRARY}" = "yes" ]; then
+	    cp -r ${BOOST_SRC_FOLDER}/!(boost-root) ${librarypath}
+        fi
     fi
 
     python3 tools/boostdep/depinst/depinst.py ../tools/quickbook

@@ -6,6 +6,7 @@
 # (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
 
 set -e
+set -x
 shopt -s extglob
 shopt -s dotglob
 
@@ -306,10 +307,13 @@ if [ "$skipboostoption" != "yes" ] ; then
 
     if [ "$typeoption" = "main" ]; then
         git submodule update --init tools/auto_index
-        git submodule update --quiet --init --recursive
+        # git submodule update --quiet --init --recursive
+        git submodule update --init --recursive
 
         # recopy the library as it might have been overwritten
-        cp -r ${BOOST_SRC_FOLDER}/!(boost-root) ${librarypath}
+        if [ ! "${BOOSTROOTLIBRARY}" = "yes" ]; then
+            cp -r ${BOOST_SRC_FOLDER}/!(boost-root) ${librarypath}
+        fi
     fi
 
     python3 tools/boostdep/depinst/depinst.py ../tools/quickbook
