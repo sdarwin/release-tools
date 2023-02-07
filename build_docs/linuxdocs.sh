@@ -308,7 +308,8 @@ if [ "$skipboostoption" != "yes" ] ; then
 
     if [ "$typeoption" = "main" ]; then
         git submodule update --init tools/auto_index
-        git submodule update --quiet --init --recursive
+        # testing this section
+        # git submodule update --quiet --init --recursive
 
         # recopy the library if it was overwritten. This step might not be necessary.
         if [ ! "${BOOSTROOTLIBRARY}" = "yes" ]; then

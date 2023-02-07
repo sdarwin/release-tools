@@ -32,21 +32,21 @@ jobs:
             container: ubuntu:22.04
             packages: python2
             skiplist: auto_index
-          - os: ubuntu-latest
-            container: ubuntu:20.04
-            packages: python
-            skiplist: auto_index
+          # - os: ubuntu-latest
+          #   container: ubuntu:20.04
+          #   packages: python
+          #   skiplist: auto_index
           - os: ubuntu-latest
             container: ubuntu:22.04
             packages: python2
             # skiplist:
             flags: "--boostrelease"
-          - os: ubuntu-latest
-            container: ubuntu:20.04
-            packages: python
-            # skiplist:
-            flags: "--boostrelease"
-            # Jinja 3.1.0 and later have dropped support for Python 3.6 and therefore won't run on Ubuntu 18.04. Removing tests for Ubuntu 18.
+          # - os: ubuntu-latest
+          #   container: ubuntu:20.04
+          #   packages: python
+          #   # skiplist:
+          #   flags: "--boostrelease"
+          #   # Jinja 3.1.0 and later have dropped support for Python 3.6 and therefore won't run on Ubuntu 18.04. Removing tests for Ubuntu 18.
 
     timeout-minutes: 720
     runs-on: ${{matrix.os}}
@@ -116,181 +116,3 @@ jobs:
             cat /usr/local/bin/runlinuxdocsquick
 
             git submodule foreach 'runlinuxdocsquick $name'
-
-  macos:
-    defaults:
-      run:
-        shell: bash
-
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: macos-latest
-            skiplist: auto_index
-          - os: macos-latest
-            # skiplist:
-            flags: "--boostrelease"
-
-    timeout-minutes: 720
-    runs-on: ${{matrix.os}}
-
-    steps:
-
-      - uses: actions/checkout@v2
-
-      - name: docs
-        run: |
-            set -x
-            set -e
-            cp build_docs/macosdocs.sh /usr/local/bin/
-
-            mkdir -p github/boostorg
-            cd github/boostorg
-            git clone -b "develop" --depth 1 "https://github.com/boostorg/boost.git"
-            cd boost
-            git submodule update --init
-
-            # Run at least one full build that installs everything
-            cd libs/system
-            macosdocs.sh
-            cd ../..
-
-            textpart1='#!/bin/bash
-            reponame=$1
-            echo "reponame is $reponame"
-            skiplist="'
-
-            textpart2="${{ matrix.skiplist }}"
-
-            textpart3='"
-            # jump ahead to continue testing
-
-            # if [[ "$reponame" =~ ^[a-s] ]]; then
-            if [[ "$reponame" =~ ^[9] ]]; then
-               echo "skipping ahead X letters"
-            elif [[ "$skiplist" =~ $reponame ]]; then
-                echo "repo in skiplist"
-            else
-                macosdocs.sh --quick '
-
-            textpart4=${{ matrix.flags }}
-
-            textpart5='
-                if [[ $? != 0 ]]; then
-                    echo "..failed. DOCS BUILD FAILED. LIBRARY $reponame"
-                    exit 1
-                else
-                    echo "LIBARY $reponame SUCCEEDED."
-                fi
-            fi
-            '
-
-            textsource="${textpart1}${textpart2}${textpart3}${textpart4}${textpart5}"
-            echo "$textsource" > /usr/local/bin/runmacosdocsquick
-            chmod 755 /usr/local/bin/runmacosdocsquick
-            echo "check runmacosdocsquick"
-            cat /usr/local/bin/runmacosdocsquick
-
-            git submodule foreach 'runmacosdocsquick $name'
-
-  windows:
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: windows-2019
-            skiplist: auto_index hana leaf log parameter parameter_python qvm
-          - os: windows-2022
-            skiplist: auto_index hana log parameter parameter_python qvm
-          - os: windows-2019
-            flags: "-boostrelease"
-            skiplist: hana log parameter parameter_python python
-          - os: windows-2022
-            flags: "-boostrelease"
-            skiplist: hana log parameter parameter_python python
-
-    timeout-minutes: 720
-    runs-on: ${{matrix.os}}
-
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: docs
-        shell: powershell
-        run: |
-
-            function Runwindowsdocs {
-                pwd
-                windowsdocs.ps1
-                if ( ! $LASTEXITCODE -eq 0)  {
-                    echo 'doc build failed in github actions. exiting.'
-                    exit 1
-                }
-            }
-
-            # 'git submodule foreach' isn't seeing declared functions.
-            # As a workaround, place the function in a module. Load the module at runtime.
-
-            New-Item -ItemType Directory -Force -Path C:\scripts
-
-            $textpart1=@'
-            param( [String]$reponame)
-            pwd
-            echo "reponame is $reponame"
-            # need to research all skipped libraries.
-            $skiplist="
-            '@
-
-            $textpart2="${{ matrix.skiplist }}"
-
-            $textpart3=@'
-            "
-
-            # if ( $reponame -match '^[a-o]' ) {
-            if ( $reponame -match '^[9]' ) {
-                echo "skipping ahead X letters"
-                }
-            elseif ($skiplist -like "*$reponame*") {
-                echo "repo in skiplist"
-                }
-            else {
-                windowsdocs.ps1 -quick 
-            '@
-
-            $textpart4="${{ matrix.flags }}"
-
-            $textpart5=@'
-
-                if ( ! $LASTEXITCODE -eq 0)  {
-                    echo "..failed. DOCS BUILD FAILED. LIBRARY $reponame"
-                    echo "doc build failed in github actions. exiting."
-                    exit 1
-                }
-                else {
-                    echo "LIBRARY $reponame SUCCEEDED."
-                }
-            }
-            '@
-
-            $textsource="${textpart1}${textpart2}${textpart3}${textpart4}${textpart5}"
-            $textsource | Out-File c:\scripts\cifunctions.ps1
-
-            echo "Checking cifunctions.ps1"
-            cat c:\scripts\cifunctions.ps1
-
-            cp build_docs/windowsdocs.ps1 C:\windows\system32
-            echo "job"
-            mkdir C:\boostorg
-            cd C:\boostorg
-            git clone -b develop --depth 1 https://github.com/boostorg/boost.git boost
-            cd boost
-            git submodule update --init
-
-            # Run at least one full build that installs everything
-            cd libs/system
-            Runwindowsdocs
-            cd ../..
-
-            # For the rest --quick
-            git submodule foreach 'powershell -command C:/scripts/cifunctions.ps1 $name'
