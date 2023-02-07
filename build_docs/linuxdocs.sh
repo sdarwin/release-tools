@@ -307,6 +307,8 @@ if [ "$skipboostoption" != "yes" ] ; then
     git submodule update --init tools/quickbook
 
     if [ "$typeoption" = "main" ]; then
+        git submodule update --init libs/format
+        git submodule update --init libs/range
         git submodule update --init tools/auto_index
         # testing this section
         # git submodule update --quiet --init --recursive
