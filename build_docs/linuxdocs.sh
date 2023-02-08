@@ -6,7 +6,7 @@
 # (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
 
 set -e
-set -x
+# set -x
 shopt -s extglob
 shopt -s dotglob
 

@@ -298,4 +298,5 @@ jobs:
                 pwd
                 cd ..
                 pwd
+                rm -rf ${reposhortname}
             done
