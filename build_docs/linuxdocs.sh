@@ -312,7 +312,7 @@ if [ "$skipboostoption" != "yes" ] ; then
 
         # recopy the library if it was overwritten. This step might not be necessary.
         if [ ! "${BOOSTROOTLIBRARY}" = "yes" ]; then
-            cp -r ${BOOST_SRC_FOLDER}/!(boost-root) ${librarypath}
+            cp -rf ${BOOST_SRC_FOLDER}/!(boost-root) ${librarypath}
             # rsync -av --delete $BOOST_SRC_FOLDER/ $librarypath
         fi
     fi
