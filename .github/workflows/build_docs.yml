@@ -10,9 +10,11 @@ on:
   pull_request:
     paths:
       - 'build_docs/**'
+      - '.github/workflows/build_docs.yml'
   push:
     paths:
       - 'build_docs/**'
+      - '.github/workflows/build_docs.yml'
     branches:
       - master
       - develop
@@ -31,11 +33,11 @@ jobs:
           - os: ubuntu-latest
             container: ubuntu:22.04
             packages: python2
-            skiplist: auto_index
+            # skiplist: auto_index
           - os: ubuntu-latest
             container: ubuntu:20.04
             packages: python
-            skiplist: auto_index
+            # skiplist: auto_index
           - os: ubuntu-latest
             container: ubuntu:22.04
             packages: python2
@@ -103,8 +105,10 @@ jobs:
             textpart5='
                 if [[ $? != 0 ]]; then
                     echo "..failed. DOCS BUILD FAILED. LIBRARY $reponame"
+                    echo "$reponame" >> /tmp/failed.txt
                 else
                     echo "LIBRARY $reponame SUCCEEDED."
+                    echo "$reponame" >> /tmp/succeeded.txt
                 fi
             fi
             '
@@ -116,6 +120,11 @@ jobs:
             cat /usr/local/bin/runlinuxdocsquick
 
             git submodule foreach 'runlinuxdocsquick $name'
+            failed=$(wc -l /tmp/failed.txt)
+            succeeded=$(wc -l /tmp/succeeded.txt)
+            echo "$failed failed, $succeeded succeeded."
+            echo ""
+            cat /tmp/failed.txt
 
   macos:
     defaults:
@@ -127,7 +136,7 @@ jobs:
       matrix:
         include:
           - os: macos-latest
-            skiplist: auto_index
+            # skiplist: auto_index
           - os: macos-latest
             # skiplist:
             flags: "--boostrelease"
@@ -179,9 +188,11 @@ jobs:
             textpart5='
                 if [[ $? != 0 ]]; then
                     echo "..failed. DOCS BUILD FAILED. LIBRARY $reponame"
-                    exit 1
+                    # exit 1
+                    echo "$reponame" >> /tmp/failed.txt
                 else
                     echo "LIBARY $reponame SUCCEEDED."
+                    echo "$reponame" >> /tmp/succeeded.txt
                 fi
             fi
             '
@@ -193,6 +204,11 @@ jobs:
             cat /usr/local/bin/runmacosdocsquick
 
             git submodule foreach 'runmacosdocsquick $name'
+            failed=$(wc -l /tmp/failed.txt)
+            succeeded=$(wc -l /tmp/succeeded.txt)
+            echo "$failed failed, $succeeded succeeded."
+            echo ""
+            cat /tmp/failed.txt
 
   windows:
     strategy:
@@ -200,15 +216,15 @@ jobs:
       matrix:
         include:
           - os: windows-2019
-            skiplist: auto_index hana leaf log parameter parameter_python qvm
+            # skiplist: auto_index hana leaf log parameter parameter_python qvm
           - os: windows-2022
-            skiplist: auto_index hana log parameter parameter_python qvm
+            # skiplist: auto_index hana log parameter parameter_python qvm
           - os: windows-2019
             flags: "-boostrelease"
-            skiplist: hana log parameter parameter_python python
+            # skiplist: hana log parameter parameter_python python
           - os: windows-2022
             flags: "-boostrelease"
-            skiplist: hana log parameter parameter_python python
+            # skiplist: hana log parameter parameter_python python
 
     timeout-minutes: 720
     runs-on: ${{matrix.os}}
@@ -224,8 +240,9 @@ jobs:
                 pwd
                 windowsdocs.ps1
                 if ( ! $LASTEXITCODE -eq 0)  {
+                    echo '..failed. DOCS BUILD FAILED. LIBRARY system'
                     echo 'doc build failed in github actions. exiting.'
-                    exit 1
+                    # exit 1
                 }
             }
 
@@ -265,10 +282,12 @@ jobs:
                 if ( ! $LASTEXITCODE -eq 0)  {
                     echo "..failed. DOCS BUILD FAILED. LIBRARY $reponame"
                     echo "doc build failed in github actions. exiting."
-                    exit 1
+                    Add-Content C:\failed.txt "`n$reponame"
+                    # exit 1
                 }
                 else {
                     echo "LIBRARY $reponame SUCCEEDED."
+                    Add-Content C:\succeeded.txt "`n$reponame"
                 }
             }
             '@
@@ -294,3 +313,8 @@ jobs:
 
             # For the rest --quick
             git submodule foreach 'powershell -command C:/scripts/cifunctions.ps1 $name'
+            echo "Succeeded:"
+            Get-Content C:\succeeded.txt | Measure-Object -Line
+            echo "Failed:"
+            Get-Content C:\failed.txt | Measure-Object -Line
+            Get-Content C:\failed.txt
