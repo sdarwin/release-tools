@@ -311,7 +311,7 @@ if [ "$skipboostoption" != "yes" ] ; then
         echo "Installing auto_index"
         ls -al build/dist/bin || true
         git submodule update --init tools/auto_index
-        python3 tools/boostdep/depinst/depinst.py -v 2 ../tools/auto_index
+        python3 tools/boostdep/depinst/depinst.py -vv ../tools/auto_index
 
         pwd
         ls -al build/dist/bin || true
@@ -323,7 +323,7 @@ if [ "$skipboostoption" != "yes" ] ; then
         fi
     fi
 
-    python3 tools/boostdep/depinst/depinst.py -v 2 ../tools/quickbook
+    python3 tools/boostdep/depinst/depinst.py -vv ../tools/quickbook
     pwd
     ls -al build/dist/bin || true
     ./bootstrap.sh
