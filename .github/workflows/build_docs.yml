@@ -143,9 +143,14 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: macos-latest
+          - os: macos-11
             # skiplist: auto_index
-          - os: macos-latest
+          - os: macos-11
+            # skiplist:
+            flags: "--boostrelease"
+          - os: macos-12
+            # skiplist: auto_index
+          - os: macos-12
             # skiplist:
             flags: "--boostrelease"
 

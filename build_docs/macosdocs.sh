@@ -319,12 +319,8 @@ if [ "$skipboostoption" != "yes" ] ; then
     sed -i 's~GLOB "/usr/share/java/saxon/"~GLOB "/Library/Java/Extensions/" "/usr/share/java/saxon/"~' tools/build/src/tools/saxonhe.jam
 
     if [ "$typeoption" = "main" ]; then
-        echo "Installing auto_index"
         git submodule update --init tools/auto_index
-        python3 tools/boostdep/depinst/depinst.py -vv ../tools/auto_index
-
-        pwd
-        ls -al build/dist/bin || true
+        python3 tools/boostdep/depinst/depinst.py ../tools/auto_index
 
         # recopy the library if it was overwritten.
         if [ ! "${BOOSTROOTLIBRARY}" = "yes" ]; then
@@ -333,10 +329,7 @@ if [ "$skipboostoption" != "yes" ] ; then
         fi
     fi
 
-    pwd
-    ls -al build/dist/bin || true
-
-    python3 tools/boostdep/depinst/depinst.py -vv ../tools/quickbook
+    python3 tools/boostdep/depinst/depinst.py ../tools/quickbook
     ./bootstrap.sh
     ./b2 headers
 
@@ -403,9 +396,7 @@ fi
 # the main compilation:
 
 if [ "$typeoption" = "main" ]; then
-    ./b2 -q -d3 --build-dir=build --distdir=build/dist tools/quickbook
-    ls -al build/dist || true
-    ls -al build/dist/bin || true 
+    ./b2 -q -d0 --build-dir=build --distdir=build/dist tools/quickbook
     ./b2 -q -d3 --build-dir=build --distdir=build/dist tools/auto_index/build
     ls -al build || true
     ls -al build/dist || true
