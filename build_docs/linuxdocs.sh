@@ -6,6 +6,7 @@
 # (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
 
 set -e
+set -x
 shopt -s extglob
 shopt -s dotglob
 
@@ -307,8 +308,13 @@ if [ "$skipboostoption" != "yes" ] ; then
     git submodule update --init tools/quickbook
 
     if [ "$typeoption" = "main" ]; then
+        echo "Installing auto_index"
+        ls -al build/dist/bin || true
         git submodule update --init tools/auto_index
-        python3 tools/boostdep/depinst/depinst.py ../tools/auto_index
+        python3 tools/boostdep/depinst/depinst.py -v 2 ../tools/auto_index
+
+        pwd
+        ls -al build/dist/bin || true
 
         # recopy the library if it was overwritten.
         if [ ! "${BOOSTROOTLIBRARY}" = "yes" ]; then
@@ -317,7 +323,9 @@ if [ "$skipboostoption" != "yes" ] ; then
         fi
     fi
 
-    python3 tools/boostdep/depinst/depinst.py ../tools/quickbook
+    python3 tools/boostdep/depinst/depinst.py -v 2 ../tools/quickbook
+    pwd
+    ls -al build/dist/bin || true
     ./bootstrap.sh
     ./b2 headers
 

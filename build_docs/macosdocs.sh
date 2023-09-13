@@ -6,6 +6,7 @@
 # (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
 
 set -e
+set -x
 shopt -s extglob
 shopt -s dotglob
 
@@ -318,8 +319,12 @@ if [ "$skipboostoption" != "yes" ] ; then
     sed -i 's~GLOB "/usr/share/java/saxon/"~GLOB "/Library/Java/Extensions/" "/usr/share/java/saxon/"~' tools/build/src/tools/saxonhe.jam
 
     if [ "$typeoption" = "main" ]; then
+        echo "Installing auto_index"
         git submodule update --init tools/auto_index
-        python3 tools/boostdep/depinst/depinst.py ../tools/auto_index
+        python3 tools/boostdep/depinst/depinst.py -v 2 ../tools/auto_index
+
+        pwd
+        ls -al build/dist/bin || true
 
         # recopy the library if it was overwritten.
         if [ ! "${BOOSTROOTLIBRARY}" = "yes" ]; then
@@ -328,7 +333,10 @@ if [ "$skipboostoption" != "yes" ] ; then
         fi
     fi
 
-    python3 tools/boostdep/depinst/depinst.py ../tools/quickbook
+    pwd
+    ls -al build/dist/bin || true
+
+    python3 tools/boostdep/depinst/depinst.py -v 2 ../tools/quickbook
     ./bootstrap.sh
     ./b2 headers
 

@@ -234,15 +234,15 @@ jobs:
       matrix:
         include:
           - os: windows-2019
-            # skiplist: auto_index hana leaf log parameter parameter_python qvm
+            # skiplist: auto_index contract hana leaf log parameter parameter_python python qvm
           - os: windows-2022
-            # skiplist: auto_index hana log parameter parameter_python qvm
+            # skiplist: auto_index contract hana log parameter parameter_python python
           - os: windows-2019
             flags: "-boostrelease"
-            # skiplist: hana log parameter parameter_python python
+            # skiplist: contract hana log parameter parameter_python python
           - os: windows-2022
             flags: "-boostrelease"
-            # skiplist: hana log parameter parameter_python python
+            # skiplist: contract hana log parameter parameter_python python
 
     timeout-minutes: 720
     runs-on: ${{matrix.os}}
@@ -335,8 +335,8 @@ jobs:
             # For the rest --quick
             git submodule foreach 'powershell -command C:/scripts/cifunctions.ps1 $name'
 
-            $succeeded = Get-Content C:\succeeded.txt | Measure-Object -Line | Out-String
-            $failed = Get-Content C:\failed.txt | Measure-Object -Line | Out-String
+            $succeeded = (Get-Content C:\succeeded.txt | Measure-Object -Line).Lines
+            $failed = (Get-Content C:\failed.txt | Measure-Object -Line).Lines
             echo "$failed failed, $succeeded succeeded."
 
             Get-Content C:\failed.txt
