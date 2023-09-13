@@ -403,7 +403,11 @@ fi
 # the main compilation:
 
 if [ "$typeoption" = "main" ]; then
-    ./b2 -q -d2 --build-dir=build --distdir=build/dist tools/quickbook tools/auto_index/build
+    ./b2 -q -d3 --build-dir=build --distdir=build/dist tools/quickbook
+    ls -al build/dist || true
+    ls -al build/dist/bin || true 
+    ./b2 -q -d3 --build-dir=build --distdir=build/dist tools/auto_index/build
+    ls -al build || true
     ls -al build/dist || true
     ls -al build/dist/bin || true 
     echo "using quickbook : build/dist/bin/quickbook ; using auto-index : build/dist/bin/auto_index ; using docutils ; using doxygen ; using boostbook ; using asciidoctor ; using saxonhe ;" > tools/build/src/user-config.jam
