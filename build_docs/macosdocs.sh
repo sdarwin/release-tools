@@ -402,7 +402,7 @@ if [ "$typeoption" = "main" ]; then
     ls -al build/dist || true
     ls -al build/dist/bin || true 
     echo "using quickbook : build/dist/bin/quickbook ; using auto-index : build/dist/bin/auto_index ; using docutils ; using doxygen ; using boostbook ; using asciidoctor ; using saxonhe ;" > tools/build/src/user-config.jam
-    ./b2 -j3 $librarypath/doc${boostrelease} cxxstd=11
+    ./b2 -j3 $librarypath/doc${boostrelease}
 
 elif  [ "$typeoption" = "cppal" ]; then
     echo "using doxygen ; using boostbook ; using saxonhe ;" > tools/build/src/user-config.jam
