@@ -221,6 +221,15 @@ jobs:
             cat /usr/local/bin/runmacosdocsquick
 
             git submodule foreach 'runmacosdocsquick $name'
+
+            # Debugging. Remove:
+            pwd
+            cd .. 
+            pwd
+            git clone -b "xslt" --depth 1 "https://github.com/sdarwin/contract"
+            cd contract/doc
+            macosdocs.sh  
+
             failed=$(wc -l /tmp/failed.txt | cut -d" " -f1)
             succeeded=$(wc -l /tmp/succeeded.txt | cut -d" " -f1)
             echo "$failed failed, $succeeded succeeded."
@@ -229,13 +238,6 @@ jobs:
             if [ "$failed" != "0" ]; then
                 exit 1
             fi
-
-            # Debugging. Remove:
-            cd github/boostorg
-            git clone -b "xslt" --depth 1 "https://github.com/sdarwin/contract"
-            cd contract/doc
-            macosdocs.sh  
-
 
   windows:
     strategy:
