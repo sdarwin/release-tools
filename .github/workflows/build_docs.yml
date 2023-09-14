@@ -230,6 +230,13 @@ jobs:
                 exit 1
             fi
 
+            # Debugging. Remove:
+            cd github/boostorg
+            git clone -b "xslt" --depth 1 "https://github.com/sdarwin/contract"
+            cd contract/doc
+            macosdocs.sh  
+
+
   windows:
     strategy:
       fail-fast: false
