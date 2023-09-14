@@ -397,7 +397,7 @@ fi
 
 if [ "$typeoption" = "main" ]; then
     ./b2 -q -d0 --build-dir=build --distdir=build/dist tools/quickbook
-    ./b2 -q -d0 --build-dir=build --distdir=build/dist tools/auto_index/build cxxstd=11
+    ./b2 -q -d0 --build-dir=build --distdir=build/dist tools/auto_index/build cxxstd=17
     ls -al build || true
     ls -al build/dist || true
     ls -al build/dist/bin || true 
@@ -406,7 +406,7 @@ if [ "$typeoption" = "main" ]; then
 
 elif  [ "$typeoption" = "cppal" ]; then
     echo "using doxygen ; using boostbook ; using saxonhe ;" > tools/build/src/user-config.jam
-    ./b2 $librarypath/doc${boostrelease}
+    ./b2 $librarypath/doc${boostrelease} cxxstd=17
 fi
 
 if [ "${BOOSTROOTLIBRARY}" = "yes" ]; then
