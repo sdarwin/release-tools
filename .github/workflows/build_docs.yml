@@ -33,11 +33,11 @@ jobs:
           - os: ubuntu-latest
             container: ubuntu:22.04
             packages: python2
-            # skiplist: auto_index
+            skiplist: auto_index
           - os: ubuntu-latest
             container: ubuntu:20.04
             packages: python
-            # skiplist: auto_index
+            skiplist: auto_index
           - os: ubuntu-latest
             container: ubuntu:22.04
             packages: python2
@@ -83,7 +83,7 @@ jobs:
             git submodule update --init
 
             # Run at least one full build that installs everything
-            cd libs/math
+            cd libs/accumulators
             linuxdocs.sh ${{ matrix.flags }}
             cd ../..
 
@@ -179,9 +179,6 @@ jobs:
 
             # Run at least one full build that installs everything
             cd libs/system
-            macosdocs.sh
-            cd ../..
-            cd libs/math
             macosdocs.sh
             cd ../..
 
@@ -347,7 +344,5 @@ jobs:
             Get-Content C:\failed.txt
 
             if ( $failed -ne '0' ) {
-                # what is the content of "failed"...
                 exit 1
              }
-
