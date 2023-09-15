@@ -144,14 +144,14 @@ jobs:
       matrix:
         include:
           - os: macos-11
-            # skiplist: auto_index
+            skiplist: auto_index contract
           - os: macos-11
-            # skiplist:
+            skiplist: contract
             flags: "--boostrelease"
           - os: macos-12
-            # skiplist: auto_index
+            skiplist: auto_index contract
           - os: macos-12
-            # skiplist:
+            skiplist: contract
             flags: "--boostrelease"
 
     timeout-minutes: 720
@@ -222,16 +222,8 @@ jobs:
 
             git submodule foreach 'runmacosdocsquick $name'
 
-            # Debugging. Remove:
-            pwd
-            cd .. 
-            pwd
-            git clone -b "xslt" --depth 1 "https://github.com/sdarwin/contract"
-            cd contract/doc
-            macosdocs.sh  
-
-            failed=$(wc -l /tmp/failed.txt | cut -d" " -f1)
-            succeeded=$(wc -l /tmp/succeeded.txt | cut -d" " -f1)
+            failed=$(wc -l /tmp/failed.txt | tr -s ' ' | cut -d' ' -f2)
+            succeeded=$(wc -l /tmp/succeeded.txt | tr -s ' ' | cut -d' ' -f2)
             echo "$failed failed, $succeeded succeeded."
             echo ""
             cat /tmp/failed.txt

@@ -6,7 +6,6 @@
 # (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
 
 set -e
-set -x
 shopt -s extglob
 shopt -s dotglob
 
@@ -396,17 +395,14 @@ fi
 # the main compilation:
 
 if [ "$typeoption" = "main" ]; then
-    ./b2 -q -d0 --build-dir=build --distdir=build/dist tools/quickbook
-    ./b2 -q -d0 --build-dir=build --distdir=build/dist tools/auto_index/build cxxstd=17
-    ls -al build || true
-    ls -al build/dist || true
-    ls -al build/dist/bin || true 
+    ./b2 -q -d0 --build-dir=build --distdir=build/dist tools/quickbook cxxstd=11
+    ./b2 -q -d0 --build-dir=build --distdir=build/dist tools/auto_index/build cxxstd=11
     echo "using quickbook : build/dist/bin/quickbook ; using auto-index : build/dist/bin/auto_index ; using docutils ; using doxygen ; using boostbook ; using asciidoctor ; using saxonhe ;" > tools/build/src/user-config.jam
     ./b2 -j3 $librarypath/doc${boostrelease}
 
 elif  [ "$typeoption" = "cppal" ]; then
     echo "using doxygen ; using boostbook ; using saxonhe ;" > tools/build/src/user-config.jam
-    ./b2 $librarypath/doc${boostrelease} cxxstd=17
+    ./b2 $librarypath/doc${boostrelease} cxxstd=11
 fi
 
 if [ "${BOOSTROOTLIBRARY}" = "yes" ]; then
