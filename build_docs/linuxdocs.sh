@@ -275,28 +275,28 @@ fi
 
 if [ "$skippackagesoption" != "yes" ] ; then
     mkdir -p build && cd build
-    if [ ! -f docbook-xsl.zip ]; then
-        wget -O docbook-xsl.zip https://sourceforge.net/projects/docbook/files/docbook-xsl/1.79.1/docbook-xsl-1.79.1.zip/download
-    fi
-    if [ ! -f docbook-xsl ]; then
-        unzip -n -d docbook-xsl docbook-xsl.zip
-    fi
-    if [ ! -f docbook-xml.zip ]; then
-        wget -O docbook-xml.zip http://www.docbook.org/xml/4.5/docbook-xml-4.5.zip
-    fi
-    if [ ! -d docbook-xml ]; then
-        unzip -n -d docbook-xml docbook-xml.zip
-    fi
+    # if [ ! -f docbook-xsl.zip ]; then
+    #     wget -O docbook-xsl.zip https://sourceforge.net/projects/docbook/files/docbook-xsl/1.79.1/docbook-xsl-1.79.1.zip/download
+    # fi
+    # if [ ! -f docbook-xsl ]; then
+    #     unzip -n -d docbook-xsl docbook-xsl.zip
+    # fi
+    # if [ ! -f docbook-xml.zip ]; then
+    #     wget -O docbook-xml.zip http://www.docbook.org/xml/4.5/docbook-xml-4.5.zip
+    # fi
+    # if [ ! -d docbook-xml ]; then
+    #     unzip -n -d docbook-xml docbook-xml.zip
+    # fi
     cd ..
 fi
 
-if [ -d ${BOOST_ROOT}/build/docbook-xsl/docbook-xsl-1.79.1 ]; then
-    export DOCBOOK_XSL_DIR=${BOOST_ROOT}/build/docbook-xsl/docbook-xsl-1.79.1
-fi
-
-if [ -d ${BOOST_ROOT}/build/docbook-xml ]; then
-    export DOCBOOK_DTD_DIR=${BOOST_ROOT}/build/docbook-xml
-fi
+# if [ -d ${BOOST_ROOT}/build/docbook-xsl/docbook-xsl-1.79.1 ]; then
+#     export DOCBOOK_XSL_DIR=${BOOST_ROOT}/build/docbook-xsl/docbook-xsl-1.79.1
+# fi
+# 
+# if [ -d ${BOOST_ROOT}/build/docbook-xml ]; then
+#     export DOCBOOK_DTD_DIR=${BOOST_ROOT}/build/docbook-xml
+# fi
 
 if [ "$skipboostoption" != "yes" ] ; then
 
