@@ -32,20 +32,20 @@ jobs:
         include:
           - os: ubuntu-latest
             container: ubuntu:22.04
-            # packages: python2
+            packages: python-is-python3
             # skiplist: auto_index
           - os: ubuntu-latest
             container: ubuntu:20.04
-            # packages: python
+            packages: python-is-python3
             # skiplist: auto_index
           - os: ubuntu-latest
             container: ubuntu:22.04
-            # packages: python2
+            packages: python-is-python3
             # skiplist:
             flags: "--boostrelease"
           - os: ubuntu-latest
             container: ubuntu:20.04
-            # packages: python
+            packages: python-is-python3
             # skiplist:
             flags: "--boostrelease"
             # Jinja 3.1.0 and later have dropped support for Python 3.6 and therefore won't run on Ubuntu 18.04. Removing tests for Ubuntu 18.
