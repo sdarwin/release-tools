@@ -177,8 +177,10 @@ if [ "$skippackagesoption" != "yes" ]; then
 
     brew install doxygen
     brew install wget
-    brew tap adoptopenjdk/openjdk
-    brew install --cask adoptopenjdk11
+    # deprecated in 2021
+    # brew tap adoptopenjdk/openjdk
+    # brew install --cask adoptopenjdk11
+    brew install --cask temurin
     brew install gnu-sed
     brew install docbook
     brew install docbook-xsl
