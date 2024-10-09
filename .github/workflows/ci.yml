@@ -45,7 +45,9 @@ jobs:
       - name: Install dependencies
         run: |
           set -xe
-          python -m pip install black
+          apt-get update
+          # python -m pip install black
+          apt-get install -y python3-black
 
       - name: Lint
         run: |

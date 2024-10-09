@@ -17,8 +17,11 @@ param (
 
 $scriptname="windowsdocs.ps1"
 $pythonvirtenvpath="${HOME}\venvboostdocs"
+$nvm_install_version="1.1.11"
+$node_version="20.17.0"
+$node_version_basic="20"
 
-# Set-PSDebug -Trace 1
+Set-PSDebug -Trace 1
 
 if ($help) {
 
@@ -200,12 +203,17 @@ else {
 # Generally, boostorg/release-tools treats all libraries the same, meaning it installs one set of packages and executes b2.
 # Therefore all libraries ought to build under 'main' and shouldn't need anything customized.
 
-$all_types="main cppalv1"
+$all_types="main antora cppalv1"
 # $cppalv1_types="json beast url http_proto socks_proto zlib"
 $cppalv1_types="not_currently_used skipping_this"
 
 if (! $typeoption ) {
-    if ($cppalv1_types.contains($REPONAME)) {
+
+
+    if (Test-Path "$BOOST_SRC_FOLDER\doc\build_antora.sh") {
+        $typeoption="antora"
+    }
+    elseif ($cppalv1_types.contains($REPONAME)) {
         $typeoption="cppalv1"
     }
     else {
@@ -216,7 +224,7 @@ if (! $typeoption ) {
 echo "Build type is $typeoption"
 
 if ( ! $all_types.contains($typeoption)) {
-    echo "Allowed types are currently 'main' and 'cppalv1'. Not $typeoption. Please choose a different option. Exiting."
+    echo "Allowed types are currently 'main', 'antora' and 'cppalv1'. Not $typeoption. Please choose a different option. Exiting."
     exit 1
 }
 
@@ -278,12 +286,31 @@ if ( -Not ${skip-packages} ) {
 
     refenv
 
-    if ( -Not (Get-Command python3 -errorAction SilentlyContinue) )
-    {
-        # create a symbolic link since windows doesn't have python3
-        $pythoncommandpath=(Get-Command python).Path
-        $python3commandpath=(Get-Command python).Path -replace 'python.exe', 'python3.exe'
-        New-Item -ItemType SymbolicLink -Path "$python3commandpath" -Target "$pythoncommandpath"
+    if ($typeoption -eq "antora") {
+
+        if ( -Not (Get-Command nvm -errorAction SilentlyContinue) )
+          {
+              # 1.1.12 doesn't allow reading stdout. Will be fixed in 1.1.13 supposedly.
+              choco install -y --no-progress nvm.install --version ${nvm_install_version}
+              Write-Output "NVM was just installed. Close this terminal window, and then restart the script."
+              Write-Output "The process has not finished. Please open a new terminal window. And restart the script."
+              exit 0
+          }
+
+        if (nvm list | Select-String "${node_version}")
+        {
+            # Node already installed
+            ForEach-Object 'foo'
+        }
+        else
+        {
+            nvm install $node_version
+            nvm use $node_version_basic
+        }
+
+        npm install gulp-cli@2.3.0
+        npm install @mermaid-js/mermaid-cli@10.5.1
+
     }
 
     if ($typeoption -eq "main") {
@@ -353,6 +380,8 @@ if ( -Not ${skip-packages} ) {
 
     # Copy-Item "C:\Program Files\doxygen\bin\doxygen.exe" "C:\Windows\System32\doxygen.exe"
 
+    if ( ( $typeoption -eq "cppalv1" ) -Or ($typeoption -eq "main" )) {
+
     cd $BOOST_SRC_FOLDER
     cd $BOOSTROOTRELPATH
     if ( -Not (Test-Path -Path "tmp") )
@@ -387,7 +416,7 @@ if ( -Not ${skip-packages} ) {
         cp saxon9he.jar Saxon-HE.jar
         cp Saxon-HE.jar "C:\usr\share\java\"
     }
-
+}
 }
 
 # In the above 'packages' section a python virtenv was created. Activate it, if that has not been done already.
@@ -395,6 +424,10 @@ if ( -Not ${skip-packages} ) {
 if ( Test-Path "${pythonvirtenvpath}\Scripts\activate" ) {
     "${pythonvirtenvpath}\Scripts\activate"
 }
+
+if ( $typeoption -eq "antora" ) {
+    nvm use $node_version_basic
+    }
 
 # re-adding the path fix from above, even if skip-packages was set.
 $newpathitem="C:\Program Files\Git\usr\bin"
@@ -516,7 +549,7 @@ if (Test-Path -Path $Folder) {
     $Env:DOCBOOK_DTD_DIR="$Env:BOOST_ROOT/build/docbook-xml"
 }
 
-if ( -Not ${skip-boost} ) {
+if ( -Not ${skip-boost} -And ( -Not ${typeoption} -eq "antora") ) {
     git submodule update --init libs/context
     git submodule update --init tools/boostbook
     git submodule update --init tools/boostdep
@@ -589,7 +622,7 @@ if ( -Not (Test-Path -Path $librarypath/doc/ )) {
     exit 0
 }
 
-if ( (Test-Path -Path $librarypath/doc/Jamfile) -or (Test-Path -Path $librarypath/doc/Jamfile.v2) -or (Test-Path -Path $librarypath/doc/Jamfile.v3) -or (Test-Path -Path $librarypath/doc/Jamfile.jam) -or (Test-Path -Path $librarypath/doc/build.jam)) {
+if ( (Test-Path -Path $librarypath/doc/build_antora.sh ) -or (Test-Path -Path $librarypath/doc/Jamfile) -or (Test-Path -Path $librarypath/doc/Jamfile.v2) -or (Test-Path -Path $librarypath/doc/Jamfile.v3) -or (Test-Path -Path $librarypath/doc/Jamfile.jam) -or (Test-Path -Path $librarypath/doc/build.jam)) {
   }
 else {
     echo "doc/Jamfile or similar is missing for this library. No need to compile. Exiting."
@@ -614,7 +647,11 @@ if ("$REPONAME" -eq "geometry") {
 
 # the main compilation:
 
-if ($typeoption -eq "main") {
+if ($typeoption -eq "antora") {
+    cd ${librarypath}/doc
+    bash ./build_antora.sh
+}
+elseif ($typeoption -eq "main") {
 
     $asciidoctorpath=(Get-Command asciidoctor).Path -replace '\\', '/'
     $autoindexpath="$Env:BOOST_ROOT/build/dist/bin/auto_index.exe"
@@ -643,9 +680,16 @@ elseif ($typeoption -eq "cppalv1") {
      }
 }
 
+if ( $typeoption -eq "antora") {
+    $result_sub_path="doc/build/site/"
+   }
+else {
+    $result_sub_path="doc/html/"
+}
+
 if ($BOOSTROOTLIBRARY -eq "yes") {
     echo ""
-    echo "Build completed. View the results in $librarypath/doc/html"
+    echo "Build completed. View the results in $librarypath/$result_sub_path"
     echo ""
 }
 else {
@@ -656,7 +700,7 @@ else {
         $pathfiller="/${BOOSTROOTRELPATH}/"
     }
     echo ""
-    echo "Build completed. View the results in ${BOOST_SRC_FOLDER}${pathfiller}boost-root/$librarypath/doc/html"
+    echo "Build completed. View the results in ${BOOST_SRC_FOLDER}${pathfiller}boost-root/$librarypath/$result_sub_path"
     echo ""
 }
 
