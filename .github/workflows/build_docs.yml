@@ -65,7 +65,7 @@ jobs:
 
     steps:
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: docs
         run: |
@@ -93,6 +93,11 @@ jobs:
 
             # Run at least one full build that installs everything
             cd libs/accumulators
+            linuxdocs.sh ${{ matrix.flags }}
+            cd ../..
+
+            # Run at least one antora build that installs everything
+            cd libs/url
             linuxdocs.sh ${{ matrix.flags }}
             cd ../..
 
@@ -173,7 +178,7 @@ jobs:
 
     steps:
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: docs
         run: |
@@ -195,6 +200,12 @@ jobs:
             cd libs/system
             macosdocs.sh
             cd ../..
+
+            # YES DO THIS but it's not ready yet
+            # # Run at least one antora build that installs everything
+            # cd libs/url
+            # macosdocs.sh
+            # cd ../..
 
             textpart1='#!/bin/bash
             reponame=$1
@@ -265,7 +276,7 @@ jobs:
     runs-on: ${{matrix.os}}
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: docs
         shell: powershell
@@ -348,6 +359,12 @@ jobs:
             cd libs/system
             Runwindowsdocs
             cd ../..
+
+            # YES DO THIS but it's not ready yet
+            # # Run at least one antora build that installs everything
+            # cd libs/url
+            # Runwindowsdocs
+            # cd ../..
 
             # For the rest --quick
             git submodule foreach 'powershell -command C:/scripts/cifunctions.ps1 $name'
