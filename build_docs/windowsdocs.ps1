@@ -210,7 +210,6 @@ $cppalv1_types="not_currently_used skipping_this"
 
 if (! $typeoption ) {
 
-
     if (Test-Path "$BOOST_SRC_FOLDER\doc\build_antora.sh") {
         $typeoption="antora"
     }
@@ -562,7 +561,8 @@ if (Test-Path -Path $Folder) {
     $Env:DOCBOOK_DTD_DIR="$Env:BOOST_ROOT/build/docbook-xml"
 }
 
-if ( -Not ${skip-boost} -And ( -Not ${typeoption} -eq "antora") ) {
+if ( -Not ${skip-boost} ) {
+  if ( -Not ( ${typeoption} -eq "antora" ) ) {
     git submodule update --init libs/context
     git submodule update --init tools/boostbook
     git submodule update --init tools/boostdep
@@ -597,6 +597,9 @@ if ( -Not ${skip-boost} -And ( -Not ${typeoption} -eq "antora") ) {
 
     Write-Output "Running ./b2 headers"
     ./b2 headers
+}}
+else {
+Write-Output "Skipping those submodules"
 }
 
 # Adjust PATH

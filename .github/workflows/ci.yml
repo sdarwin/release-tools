@@ -47,7 +47,7 @@ jobs:
           set -xe
           apt-get update
           # python -m pip install black
-          apt-get install -y python3-black
+          apt-get install -y black
 
       - name: Lint
         run: |
