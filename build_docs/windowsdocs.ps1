@@ -676,7 +676,7 @@ elseif ($typeoption -eq "main") {
     $quickbookpath="$Env:BOOST_ROOT/build/dist/bin/quickbook.exe"
     $quickbookpath=$quickbookpath -replace '\\', '/'
 
-    ./b2 -q -d0 --build-dir=build --distdir=build/dist tools/quickbook tools/auto_index/build
+    ./b2 -q -d0 --build-dir=build --distdir=build/dist tools/quickbook tools/auto_index
     $content="using quickbook : `"$quickbookpath`" ; using auto-index : `"$autoindexpath`" ; using docutils ; using doxygen : `"/Program Files/doxygen/bin/doxygen.exe`" ; using boostbook ; using asciidoctor : `"$asciidoctorpath`" ; using saxonhe ;"
     $filename="$Env:BOOST_ROOT\tools\build\src\user-config.jam"
     [IO.File]::WriteAllLines($filename, $content)

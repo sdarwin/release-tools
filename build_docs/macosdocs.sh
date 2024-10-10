@@ -482,7 +482,7 @@ fi
 
 if [ "$typeoption" = "main" ]; then
     ./b2 -q -d0 --build-dir=build --distdir=build/dist tools/quickbook cxxstd=11
-    ./b2 -q -d0 --build-dir=build --distdir=build/dist tools/auto_index/build cxxstd=11
+    ./b2 -q -d0 --build-dir=build --distdir=build/dist tools/auto_index cxxstd=11
     echo "using quickbook : build/dist/bin/quickbook ; using auto-index : build/dist/bin/auto_index ; using docutils ; using doxygen ; using boostbook ; using asciidoctor ; using saxonhe ;" > tools/build/src/user-config.jam
     ./b2 -j3 $librarypath/doc${boostrelease}
 
