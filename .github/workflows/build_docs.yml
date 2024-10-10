@@ -201,11 +201,10 @@ jobs:
             macosdocs.sh
             cd ../..
 
-            # YES DO THIS but it's not ready yet
-            # # Run at least one antora build that installs everything
-            # cd libs/url
-            # macosdocs.sh
-            # cd ../..
+            # Run at least one antora build that installs everything
+            cd libs/url
+            macosdocs.sh
+            cd ../..
 
             textpart1='#!/bin/bash
             reponame=$1
