@@ -429,7 +429,7 @@ else
 fi
 
 if [ "$REPONAME" = "geometry" ]; then
-    ./b2 $librarypath/doc/src/docutils/tools/doxygen_xml2qbk
+    ./b2 $librarypath/doc/src/docutils/tools/doxygen_xml2qbk/
     # adjusting PATH var instead
     # cp dist/bin/doxygen_xml2qbk /usr/local/bin/
     echo "Debugging for macos. which sphinx-build"

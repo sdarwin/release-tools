@@ -647,7 +647,7 @@ else {
 
 if ("$REPONAME" -eq "geometry") {
     Write-Output "In geometry exception. running ./b2 $librarypath/doc/src/docutils/tools/doxygen_xml2qbk"
-    ./b2 $librarypath/doc/src/docutils/tools/doxygen_xml2qbk
+    ./b2 $librarypath/doc/src/docutils/tools/doxygen_xml2qbk/
     Write-Output "running Get-Location"
     Get-Location
     Write-Output "running dir dist\bin"

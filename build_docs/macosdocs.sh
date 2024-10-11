@@ -464,7 +464,7 @@ fi
 if [ "$REPONAME" = "geometry" ]; then
     set -x
     echo "in the geometry exception. ./b2 $librarypath/doc/src/docutils/tools/doxygen_xml2qbk"
-    ./b2 $librarypath/doc/src/docutils/tools/doxygen_xml2qbk
+    ./b2 $librarypath/doc/src/docutils/tools/doxygen_xml2qbk/
     echo "running pwd"
     pwd
     echo "Running find command"
