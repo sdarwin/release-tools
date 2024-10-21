@@ -47,6 +47,8 @@ jfrogURL = "https://boostorg.jfrog.io/artifactory/"
 fastlyURL = "https://archives.boost.io/"
 s3_archives_bucket = "boost-archives"
 aws_profile = "production"
+boost_repo_url = "git@github.com:sdarwin/boost.git"
+boost_repo_parent_directory = "/opt/release-tools-github"
 
 # defaults, used later
 stagingPath2 = ""
@@ -173,6 +175,9 @@ def copyStagingS3():
 
 def preflight():
     load_dotenv()
+
+    print("Test ssh to brorigin servers")
+
     SSH_USER = os.getenv("SSH_USER", "mclow")
     for origin in ["brorigin1.cpp.al", "brorigin2.cpp.al"]:
         result = subprocess.run(
@@ -192,6 +197,22 @@ def preflight():
                 print("Exiting.")
                 exit(1)
 
+    print("Test github connection")
+
+        result = subprocess.run(
+            f'ssh -T git@github.com',
+            shell=True,
+            capture_output=True,
+            text=True,
+        )
+        if not "successfully authenticated" in result.stderr:
+            print("GITHUB TEST FAILED")
+            print("Preflight test of your connection to github failed. This command was run: 'ssh -T git@github.com' You should configure ~/.ssh/config with:\nHost github.com\n    User git\n    Hostname github.com\n    PreferredAuthentications publickey\n    IdentityFile /home/__path__to__file__")
+            print(result)
+            answer = input("Do you want to continue anyway: [y/n]")
+            if not answer or answer[0].lower() != "y":
+                print("Exiting.")
+                exit(1)
 
 #####
 usage = "usage: %prog [options] boost_version     # Example: %prog 1_85_0"
@@ -266,6 +287,8 @@ if len(args) != 1:
     exit(1)
 
 preflight()
+
+git_tags()
 
 boostVersion = args[0]
 dottedVersion = boostVersion.replace("_", ".")
