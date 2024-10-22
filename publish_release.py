@@ -48,7 +48,7 @@ fastlyURL = "https://archives.boost.io/"
 s3_archives_bucket = "boost-archives"
 aws_profile = "production"
 boost_repo_url = "git@github.com:sdarwin/boost.git"
-boost_repo_parent_directory = "/opt/release-tools-github"
+boost_branch = "master"
 
 # defaults, used later
 stagingPath2 = ""
@@ -173,6 +173,56 @@ def copyStagingS3():
         print(result)
 
 
+def git_tags():
+    boost_repo_parent_dir = str(Path.home()) + "/github/release-tools-cache"
+    Path(boost_repo_parent_dir).mkdir(parents=True, exist_ok=True)
+    origDir = os.getcwd()
+    os.chdir(boost_repo_parent_dir)
+
+    if not os.path.isdir("boost"):
+        result = subprocess.run(
+            f"git clone -b {boost_branch} {boost_repo_url}",
+            check=True,
+            shell=True,
+            text=True,
+        )
+        if result.returncode != 0:
+            print("git checkout failed")
+            print(result)
+            exit(1)
+    os.chdir("boost")
+    print("checking branch")
+    result = subprocess.run(
+        f" git rev-parse --abbrev-ref HEAD", capture_output=True, shell=True, text=True
+    )
+    if not boost_branch in result.stdout:
+        print("branch check failed")
+        print(result)
+        exit(1)
+    print("checking remote")
+    result = subprocess.run(
+        f"git remote -v | grep origin", capture_output=True, shell=True, text=True
+    )
+    if not boost_repo_url in result.stdout:
+        print("git remote check failed")
+        print(result)
+        exit(1)
+    print("git pull")
+    result = subprocess.run(f"git pull", shell=True, capture_output=True, text=True)
+    if result.returncode != 0:
+        print("git pull failed")
+        print(result)
+        exit(1)
+    print("git submodule update --init --recursive")
+    result = subprocess.run(
+        f"git submodule update --init --recursive", shell=True, text=True
+    )
+    if result.returncode != 0:
+        print("git submodule update failed")
+        print(result)
+        exit(1)
+
+
 def preflight():
     load_dotenv()
 
@@ -199,20 +249,23 @@ def preflight():
 
     print("Test github connection")
 
-        result = subprocess.run(
-            f'ssh -T git@github.com',
-            shell=True,
-            capture_output=True,
-            text=True,
+    result = subprocess.run(
+        f"ssh -T git@github.com",
+        shell=True,
+        capture_output=True,
+        text=True,
+    )
+    if not "successfully authenticated" in result.stderr:
+        print("GITHUB TEST FAILED")
+        print(
+            "Preflight test of your connection to github failed. This command was run: 'ssh -T git@github.com' You should configure ~/.ssh/config with:\nHost github.com\n    User git\n    Hostname github.com\n    PreferredAuthentications publickey\n    IdentityFile /home/__path__to__file__"
         )
-        if not "successfully authenticated" in result.stderr:
-            print("GITHUB TEST FAILED")
-            print("Preflight test of your connection to github failed. This command was run: 'ssh -T git@github.com' You should configure ~/.ssh/config with:\nHost github.com\n    User git\n    Hostname github.com\n    PreferredAuthentications publickey\n    IdentityFile /home/__path__to__file__")
-            print(result)
-            answer = input("Do you want to continue anyway: [y/n]")
-            if not answer or answer[0].lower() != "y":
-                print("Exiting.")
-                exit(1)
+        print(result)
+        answer = input("Do you want to continue anyway: [y/n]")
+        if not answer or answer[0].lower() != "y":
+            print("Exiting.")
+            exit(1)
+
 
 #####
 usage = "usage: %prog [options] boost_version     # Example: %prog 1_85_0"
@@ -236,6 +289,17 @@ parser.add_option(
     help="print progress information",
     dest="progress",
 )
+
+parser.add_option(
+    "-g",
+    "--git-tag",
+    default=False,
+    action="store_true",
+    help="tag the release in git/github",
+    dest="git_tagging",
+)
+
+
 # The main 'dryrun' setting now applies to the following topics:
 # archive uploads to s3
 # files uploads to s3 for the website
@@ -288,7 +352,19 @@ if len(args) != 1:
 
 preflight()
 
-git_tags()
+if options.git_tagging:
+    git_tags()
+else:
+    print(
+        "You did not run this script with the --git-tag option. Please be sure you have already tagged the git repos. In the future publish-release.py could default to --git-tag being enabled."
+    )
+    answer = input("Do you want to continue anyway: [y/n]")
+    if not answer or answer[0].lower() != "y":
+        print("Exiting.")
+        exit(1)
+
+print("During testing only. Exit.")
+exit(0)
 
 boostVersion = args[0]
 dottedVersion = boostVersion.replace("_", ".")
