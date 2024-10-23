@@ -39,6 +39,7 @@ import json
 from pathlib import Path
 import subprocess
 import pathlib
+import time
 
 # run: pip3 install python-dotenv
 from dotenv import load_dotenv
@@ -47,7 +48,7 @@ jfrogURL = "https://boostorg.jfrog.io/artifactory/"
 fastlyURL = "https://archives.boost.io/"
 s3_archives_bucket = "boost-archives"
 aws_profile = "production"
-
+boost_websites = ["https://www.boost.io", "https://www.stage.boost.cppalliance.org"]
 # defaults, used later
 stagingPath2 = ""
 checksum_succeeded = True
@@ -191,6 +192,92 @@ def preflight():
             if not answer or answer[0].lower() != "y":
                 print("Exiting.")
                 exit(1)
+
+    print("Checking admin login to boost.io")
+    WEB_USER = os.getenv("WEB_USER", "marshall@idio.com")
+    WEB_PASSWORD = os.getenv("WEB_USER", "qqq")
+    WEBSITE_URL = boost_websites[0]
+    BASE_ADMIN = f"{WEBSITE_URL}/admin/"
+    LOGIN = f"{BASE_ADMIN}login/"
+    NEW_RELEASE = f"{BASE_ADMIN}versions/version/new_versions/"
+
+    session = requests.session()
+    # do a request just to get a csrftoken
+    response = session.get(LOGIN)
+    response.raise_for_status()
+    response = session.post(
+        LOGIN,
+        data={
+            "csrfmiddlewaretoken": session.cookies["csrftoken"],
+            "username": WEB_USER,
+            "password": WEB_PASSWORD,
+        },
+    )
+    response.raise_for_status()
+    if "errornote" in response.text:
+        print(
+            "An 'errornote' was found in the attempt to log into boost.io with your WEB_USER and WEB_PASSWORD. Review those values in the .env file, and try manually logging into the admin panel"
+        )
+        answer = input("Do you want to continue anyway: [y/n]")
+        if not answer or answer[0].lower() != "y":
+            print("Exiting.")
+            exit(1)
+
+
+def import_new_releases():
+    print(
+        "\nThe last step is to trigger a version import on boost.io. This can also be done by visiting https://www.boost.io/admin/versions/version/ and clicking Import New Releases. publish_release.py will remotely contact that webpage with a GET request.\n"
+    )
+    print("Waiting 2 minutes for the CDN to update, before proceeding.\n")
+    time.sleep(120)
+
+    for s in suffixes:
+        for appended in ["", ".json"]:
+            archiveFilename = actualName + s + appended
+            archivePathRemote = re.sub("^main/", "", destRepo)
+            url = f"{fastlyURL}{archivePathRemote}{archiveFilename}"
+
+            result = subprocess.run(
+                f"curl --output /dev/null --silent --head --fail {url}",
+                capture_output=True,
+                shell=True,
+                text=True,
+            )
+
+            if result.returncode != 0:
+                print(
+                    f"\n{archiveFilename} is not present on the CDN, when it was expected. Check all the release files are available for download, and then manually log into the website to import releases. Exiting.\n"
+                )
+                print(result)
+                exit(1)
+            else:
+                print("Expected archive file is present. See debug output below. continuing.")
+                print (result)
+
+    for boost_website in boost_websites:
+        WEB_USER = os.getenv("WEB_USER", "marshall@idio.com")
+        WEB_PASSWORD = os.getenv("WEB_USER", "qqq")
+        BASE_ADMIN = f"{boost_website}/admin/"
+        LOGIN = f"{BASE_ADMIN}login/"
+        NEW_RELEASE = f"{BASE_ADMIN}versions/version/new_versions/"
+        session = requests.session()
+        # do a request just to get a csrftoken
+        response = session.get(LOGIN)
+        response.raise_for_status()
+        response = session.post(
+            LOGIN,
+            data={
+                "csrfmiddlewaretoken": session.cookies["csrftoken"],
+                "username": WEB_USER,
+                "password": WEB_PASSWORD,
+            },
+        )
+        response.raise_for_status()
+        print(f"Contacting {NEW_RELEASE}")
+        response = session.get(NEW_RELEASE)
+        response.raise_for_status()
+
+    # End of function import_new_releases
 
 
 #####
@@ -455,3 +542,5 @@ if not options.dryrun:
         if result.returncode != 0:
             print("SSH FAILED")
             print(result)
+
+import_new_releases()
