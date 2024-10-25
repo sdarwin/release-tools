@@ -137,7 +137,7 @@ if ($pathoption) {
 }
 else
 {
-    $workingdir = Get-Location
+    $workingdir = Get-Location | Foreach-Object { $_.Path }
     Write-Output "Using current working directory $workingdir."
 }
 
@@ -295,14 +295,14 @@ if ( -Not ${skip-packages} ) {
         }
 
     refenv
-	
+
     if ($typeoption -eq "antora") {
 
         if ( -Not (Get-Command clang++ -errorAction SilentlyContinue) )
         {
             choco install -y --no-progress llvm
         }
-		
+
         if ( -Not (Get-Command 7z -errorAction SilentlyContinue) )
         {
             choco install -y --no-progress 7zip.install
@@ -318,7 +318,7 @@ if ( -Not ${skip-packages} ) {
           }
 
         refenv
-				
+
         if (nvm list | Select-String "${node_version}")
         {
             # Node already installed
@@ -684,12 +684,11 @@ if ($typeoption -eq "antora") {
         New-Item -Path "c:\" -Name "tmp" -ItemType "directory"  -Force
         New-Item -Path "c:\tmp\" -Name "${REPONAME}-${timestamp}" -ItemType "directory"  -Force
         Copy-Item -Path "${librarypath}\*" -Destination "C:\tmp\${REPONAME}-${timestamp}\" -Recurse -Force
-        cd C:\tmp\${REPONAME}-${timestamp}\
-        dir
-        $librarypath=$(pwd)
-        rm .git
+        Set-Location C:\tmp\${REPONAME}-${timestamp}\
+        Get-ChildItem
+        Remove-Item .git
         git init
-        cd doc
+        Set-Location doc
     }
     else {
      Set-Location ${librarypath}/doc
