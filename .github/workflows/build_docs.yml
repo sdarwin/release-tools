@@ -34,32 +34,32 @@ jobs:
             container: ubuntu:24.04
             packages: python-is-python3
             skiplist: auto_index
-            flags: "--debug"
+            flags: --debug
           - os: ubuntu-latest
             container: ubuntu:22.04
             packages: python2
             skiplist: auto_index
-            flags: "--debug"
+            flags: --debug
           - os: ubuntu-latest
             container: ubuntu:20.04
             packages: python
             skiplist: auto_index
-            flags: "--debug"
+            flags: --debug
           - os: ubuntu-latest
             container: ubuntu:24.04
             packages: python-is-python3
             # skiplist:
-            flags: "--debug --boostrelease"
+            flags: --debug --boostrelease
           - os: ubuntu-latest
             container: ubuntu:22.04
             packages: python2
             # skiplist:
-            flags: "--debug --boostrelease"
+            flags: --debug --boostrelease
           - os: ubuntu-latest
             container: ubuntu:20.04
             packages: python
             # skiplist:
-            flags: "--debug --boostrelease"
+            flags: --debug --boostrelease
             # Jinja 3.1.0 and later have dropped support for Python 3.6 and therefore won't run on Ubuntu 18.04. Removing tests for Ubuntu 18.
 
     timeout-minutes: 720
@@ -164,19 +164,19 @@ jobs:
           #   skiplist: auto_index contract
           # - os: macos-11
           #   skiplist: contract
-          #   flags: "--debug --boostrelease"
+          #   flags: --debug --boostrelease
           - os: macos-12
             skiplist: auto_index contract
-            flags: "--debug"
+            flags: --debug
           - os: macos-12
             skiplist: contract
-            flags: "--debug --boostrelease"
+            flags: --debug --boostrelease
           - os: macos-14
             skiplist: auto_index contract
-            flags: "--debug"
+            flags: --debug
           - os: macos-14
             skiplist: contract
-            flags: "--debug --boostrelease"
+            flags: --debug --boostrelease
 
     timeout-minutes: 720
     runs-on: ${{matrix.os}}
