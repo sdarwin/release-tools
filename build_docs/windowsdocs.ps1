@@ -61,7 +61,7 @@ else {
 
 if ($boostrootsubdir) {
     ${BOOSTROOTRELPATH} = "."
-    ${boostrootsubdiroption = "yes"
+    ${boostrootsubdiroption} = "yes"
   }
 else {
     ${BOOSTROOTRELPATH} = ".."
