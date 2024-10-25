@@ -122,7 +122,7 @@ jobs:
             else
                 linuxdocs.sh --quick '
 
-            textpart4=${{ matrix.flags }}
+            textpart4="${{ matrix.flags }}"
             textpart5='
                 if [[ $? != 0 ]]; then
                     echo "..failed. DOCS BUILD FAILED. LIBRARY $reponame"
@@ -229,7 +229,7 @@ jobs:
             else
                 macosdocs.sh --quick '
 
-            textpart4=${{ matrix.flags }}
+            textpart4="${{ matrix.flags }}"
 
             textpart5='
                 if [[ $? != 0 ]]; then
