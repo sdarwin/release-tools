@@ -61,6 +61,7 @@ else {
 
 if ($boostrootsubdir) {
     ${BOOSTROOTRELPATH} = "."
+    ${boostrootsubdiroption = "yes"
   }
 else {
     ${BOOSTROOTRELPATH} = ".."
@@ -169,6 +170,15 @@ if ( ! $LASTEXITCODE -eq 0)  {
 }
 else {
     Write-Output "BOOST_SRC_FOLDER is $BOOST_SRC_FOLDER"
+}
+
+# The purpose of this is to allow nvm/npm/node to use a subdirectory of the library in CI, so the job is self-contained
+# and doesn't use external directories.
+# On WINDOWS, this has not yet been tested. It's not certain that it must be done, or if there are side-effects.
+# Copying the logic from linuxdocs.sh. Since CI isn't usually done on Windows, it may not be important.
+if ( ${boostrootsubdiroption} -eq "yes" ) {
+    New-Item -Path "${BOOST_SRC_FOLDER}\"  -Name "tmp_home" -ItemType "directory"
+    Set-Variable HOME "${BOOST_SRC_FOLDER}\tmp_home" -Force
 }
 
 $PARENTNAME=[io.path]::GetFileNameWithoutExtension($(git --git-dir $BOOST_SRC_FOLDER/../.git config --get remote.origin.url))
@@ -664,7 +674,19 @@ if ("$REPONAME" -eq "geometry") {
 # the main compilation:
 
 if ($typeoption -eq "antora") {
-    Set-Location ${librarypath}/doc
+
+    Set-Location ${librarypath}
+    if ( Test-Path "${librarypath}\.git" -PathType Leaf ) {
+        Write-Output "Antora will not run on a git module. Copying to /tmp"
+        New-Item -Path "c:\" -Name "tmp" -ItemType "directory"  -Force
+        cd ..
+        Copy-Item -Path "${librarypath}\*" -Destination "C:\tmp\" -Recurse -Container
+        cd /tmp/${REPONAME}
+        $librarypath=$(pwd)
+        Write-Output "NOT DONE. RUN git init. Checking linuxdocs.sh first though"
+    }
+
+     Set-Location ${librarypath}/doc
 	dos2unix .\build_antora.sh
     & 'C:\Program Files\Git\bin\bash.exe' .\build_antora.sh
 }

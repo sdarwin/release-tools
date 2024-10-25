@@ -34,29 +34,32 @@ jobs:
             container: ubuntu:24.04
             packages: python-is-python3
             skiplist: auto_index
+            flags: "--debug"
           - os: ubuntu-latest
             container: ubuntu:22.04
             packages: python2
             skiplist: auto_index
+            flags: "--debug"
           - os: ubuntu-latest
             container: ubuntu:20.04
             packages: python
             skiplist: auto_index
+            flags: "--debug"
           - os: ubuntu-latest
             container: ubuntu:24.04
             packages: python-is-python3
             # skiplist:
-            flags: "--boostrelease"
+            flags: "--debug --boostrelease"
           - os: ubuntu-latest
             container: ubuntu:22.04
             packages: python2
             # skiplist:
-            flags: "--boostrelease"
+            flags: "--debug --boostrelease"
           - os: ubuntu-latest
             container: ubuntu:20.04
             packages: python
             # skiplist:
-            flags: "--boostrelease"
+            flags: "--debug --boostrelease"
             # Jinja 3.1.0 and later have dropped support for Python 3.6 and therefore won't run on Ubuntu 18.04. Removing tests for Ubuntu 18.
 
     timeout-minutes: 720
@@ -112,7 +115,7 @@ jobs:
             # jump ahead to continue testing
 
             # if [[ "$reponame" =~ ^[a-fh-z] ]]; then
-            if [[ "$reponame" =~ ^[9] ]]; then
+            if [[ "$reponame" =~ ^[a-tv-z] ]]; then
                echo "skipping ahead X letters"
             elif [[ "$skiplist" =~ $reponame ]]; then
                 echo "repo in skiplist"
@@ -161,17 +164,19 @@ jobs:
           #   skiplist: auto_index contract
           # - os: macos-11
           #   skiplist: contract
-          #   flags: "--boostrelease"
+          #   flags: "--debug --boostrelease"
           - os: macos-12
             skiplist: auto_index contract
+            flags: "--debug"
           - os: macos-12
             skiplist: contract
-            flags: "--boostrelease"
+            flags: "--debug --boostrelease"
           - os: macos-14
             skiplist: auto_index contract
+            flags: "--debug"
           - os: macos-14
             skiplist: contract
-            flags: "--boostrelease"
+            flags: "--debug --boostrelease"
 
     timeout-minutes: 720
     runs-on: ${{matrix.os}}
@@ -217,7 +222,7 @@ jobs:
             # jump ahead to continue testing
 
             # if [[ "$reponame" =~ ^[a-s] ]]; then
-            if [[ "$reponame" =~ ^[9] ]]; then
+            if [[ "$reponame" =~ ^[a-tv-z] ]]; then
                echo "skipping ahead X letters"
             elif [[ "$skiplist" =~ $reponame ]]; then
                 echo "repo in skiplist"
@@ -313,7 +318,7 @@ jobs:
             "
 
             # if ( $reponame -match '^[a-o]' ) {
-            if ( $reponame -match '^[9]' ) {
+            if ( $reponame -match '^[a-tv-z]' ) {
                 echo "skipping ahead X letters"
                 }
             elseif ($skiplist -like "*$reponame*") {

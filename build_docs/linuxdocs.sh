@@ -5,7 +5,7 @@
 # Distributed under the Boost Software License, Version 1.0.
 # (See accompanying file LICENSE_1_0.txt or copy at http://boost.org/LICENSE_1_0.txt)
 
-set -ex
+set -e
 shopt -s extglob
 shopt -s dotglob
 
@@ -67,7 +67,7 @@ standard arguments:
 	--boostrelease)
 	    boostrelease="//boostrelease" ; shift 2 ;;
 	--boostrootsubdir)
-		BOOSTROOTRELPATH="." ; shift 2 ;;
+	    boostrootsubdiroption="yes" ; BOOSTROOTRELPATH="." ; shift 2 ;;
         --) shift ; break ;;
         *) echo "Internal error!" ; exit 1 ;;
     esac
@@ -97,6 +97,13 @@ fi
 export REPONAME=$(basename -s .git `git config --get remote.origin.url` 2> /dev/null || echo "empty")
 export BOOST_SRC_FOLDER=$(git rev-parse --show-toplevel 2> /dev/null || echo "nofolder")
 
+# The purpose of this is to allow nvm/npm/node to use a subdirectory of the library in CI, so the job is self-contained
+# and doesn't use external directories.
+if [ "${boostrootsubdiroption}" = "yes" ]; then
+    mkdir -p "${BOOST_SRC_FOLDER}/tmp_home"
+    export HOME=${BOOST_SRC_FOLDER}/tmp_home 
+fi
+    
 if [ "${REPONAME}" = "empty" -o "${REPONAME}" = "release-tools" ]; then
     echo -e "\nSet the path_to_library as the first command-line argument:\n\n$scriptname _path_to_library_\n\nOr change the working directory to that first.\n"
     exit 1
@@ -448,6 +455,16 @@ if [ "$typeoption" = "main" ]; then
     ./b2 -j3 $librarypath/doc${boostrelease}
 
 elif [ "$typeoption" = "antora" ]; then
+    cd ${librarypath}
+    if [ -f ".git" ]; then
+        echo "Antora will not run on a git module. Copying to /tmp"
+        cd ..
+        cp -rp ${librarypath} /tmp/
+        cd /tmp/${REPONAME}
+        librarypath=$(pwd)
+        rm .git
+        git init
+    fi
     cd ${librarypath}/doc
     chmod 755 build_antora.sh
     ./build_antora.sh
