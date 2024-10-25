@@ -494,17 +494,17 @@ if [ "$typeoption" = "main" ]; then
     ./b2 -j3 $librarypath/doc${boostrelease}
 
 elif [ "$typeoption" = "antora" ]; then
-    cd ${librarypath}
-    if [ -f ".git" ]; then
+    if [ -f "${librarypath}/.git" ]; then
         echo "Antora will not run on a git module. Copying to /tmp"
         cd ..
         cp -rp ${librarypath} /tmp/
         cd /tmp/${REPONAME}
-        librarypath=$(pwd)
         rm .git
         git init
+        cd doc
+    else
+        cd ${librarypath}/doc
     fi
-    cd ${librarypath}/doc
     chmod 755 build_antora.sh
     ./build_antora.sh
 

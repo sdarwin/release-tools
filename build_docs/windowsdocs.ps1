@@ -353,7 +353,8 @@ if ( -Not ${skip-packages} ) {
         gem install asciidoctor-diagram --version 2.2.14
         gem install asciidoctor-multipage --version 0.0.18
         pip3 install docutils
-        Invoke-WebRequest -O rapidxml.zip http://sourceforge.net/projects/rapidxml/files/latest/download
+        # Invoke-WebRequest -O rapidxml.zip http://sourceforge.net/projects/rapidxml/files/latest/download
+        Invoke-WebRequest -O rapidxml.zip https://downloads.sourceforge.net/project/rapidxml/rapidxml/rapidxml%201.13/rapidxml-1.13.zip
         unzip -n -d rapidxml rapidxml.zip
         #
         # pip3 had been using --user. what will happen without.
@@ -675,7 +676,6 @@ if ("$REPONAME" -eq "geometry") {
 
 if ($typeoption -eq "antora") {
 
-    Set-Location ${librarypath}
     if ( Test-Path "${librarypath}\.git" -PathType Leaf ) {
         Write-Output "Antora will not run on a git module. Copying to /tmp"
         New-Item -Path "c:\" -Name "tmp" -ItemType "directory"  -Force
@@ -683,10 +683,13 @@ if ($typeoption -eq "antora") {
         Copy-Item -Path "${librarypath}\*" -Destination "C:\tmp\" -Recurse -Container
         cd /tmp/${REPONAME}
         $librarypath=$(pwd)
-        Write-Output "NOT DONE. RUN git init. Checking linuxdocs.sh first though"
+        rm .git
+        git init
+        cd doc
     }
-
+    else {
      Set-Location ${librarypath}/doc
+      }
 	dos2unix .\build_antora.sh
     & 'C:\Program Files\Git\bin\bash.exe' .\build_antora.sh
 }
