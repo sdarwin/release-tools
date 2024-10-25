@@ -494,10 +494,14 @@ if [ "$typeoption" = "main" ]; then
     ./b2 -j3 $librarypath/doc${boostrelease}
 
 elif [ "$typeoption" = "antora" ]; then
+    library_is_submodule=""
+    timestamp=""
     if [ -f "${librarypath}/.git" ]; then
+        library_is_submodule="true"
+        timestamp=$(date +%s)
         echo "Antora will not run on a git module. Copying to /tmp"
-        cp -rp ${librarypath} /tmp/
-        cd /tmp/${REPONAME}
+        cp -rp ${librarypath} /tmp/${REPONAME}-${timestamp}
+        cd /tmp/${REPONAME}-${timestamp}
         rm .git
         git init
         cd doc
@@ -506,6 +510,11 @@ elif [ "$typeoption" = "antora" ]; then
     fi
     chmod 755 build_antora.sh
     ./build_antora.sh
+
+    if [ "$library_is_submodule" = "true" ]; then
+        mkdir -p ${librarypath}/doc/build/
+        cp -rp build/* ${librarypath}/doc/build/
+    fi
 
 elif [ "$typeoption" = "cppalv1" ]; then
     echo "using doxygen ; using boostbook ; using saxonhe ;" > tools/build/src/user-config.jam

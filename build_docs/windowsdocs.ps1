@@ -675,12 +675,16 @@ if ("$REPONAME" -eq "geometry") {
 # the main compilation:
 
 if ($typeoption -eq "antora") {
-
+    $library_is_submodule=""
+    $timestamp=""
     if ( Test-Path "${librarypath}\.git" -PathType Leaf ) {
+        $library_is_submodule="true"
+        $timestamp=[int](Get-Date -UFormat %s -Millisecond 0)
         Write-Output "Antora will not run on a git module. Copying to /tmp"
         New-Item -Path "c:\" -Name "tmp" -ItemType "directory"  -Force
-        Copy-Item -Path "${librarypath}\*" -Destination "C:\tmp\${REPONAME}\" -Recurse -Force
-        cd C:\tmp\${REPONAME}\
+        New-Item -Path "c:\tmp\" -Name "${REPONAME}-${timestamp}" -ItemType "directory"  -Force
+        Copy-Item -Path "${librarypath}\*" -Destination "C:\tmp\${REPONAME}-${timestamp}\" -Recurse -Force
+        cd C:\tmp\${REPONAME}-${timestamp}\
         dir
         $librarypath=$(pwd)
         rm .git
@@ -692,6 +696,13 @@ if ($typeoption -eq "antora") {
       }
 	dos2unix .\build_antora.sh
     & 'C:\Program Files\Git\bin\bash.exe' .\build_antora.sh
+
+
+    if ( $library_is_submodule -eq "true" ) {
+        New-Item -Path ""${librarypath}\doc\"" -Name "build" -ItemType "directory"  -Force
+        Copy-Item -Path "build\*" -Destination "${librarypath}\doc\build\" -Recurse -Force
+    }
+
 }
 elseif ($typeoption -eq "main") {
 
