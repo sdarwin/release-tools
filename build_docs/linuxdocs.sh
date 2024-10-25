@@ -477,8 +477,8 @@ elif [ "$typeoption" = "antora" ]; then
     ./build_antora.sh
 
     if [ "$library_is_submodule" = "true" ]; then
-        mkdir -p ${librarypath}/doc/build/
-        cp -rp build/* ${librarypath}/doc/build/
+        mkdir -p ${BOOST_ROOT}/${librarypath}/doc/build/
+        cp -rp build/* ${BOOST_ROOT}/${librarypath}/doc/build/
     fi   
 
 elif [ "$typeoption" = "cppalv1" ]; then
