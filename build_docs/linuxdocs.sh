@@ -449,6 +449,10 @@ fi
 
 # the main compilation:
 
+echo "DEBUGGING"
+pwd
+ls -al libs || true
+
 if [ "$typeoption" = "main" ]; then
     ./b2 -q -d0 --build-dir=build --distdir=build/dist tools/quickbook tools/auto_index
     echo "using quickbook : build/dist/bin/quickbook ; using auto-index : build/dist/bin/auto_index ; using docutils : /usr/share/docutils ; using doxygen ; using boostbook ; using asciidoctor ; using saxonhe ;" > tools/build/src/user-config.jam
@@ -457,7 +461,6 @@ if [ "$typeoption" = "main" ]; then
 elif [ "$typeoption" = "antora" ]; then
     if [ -f "${librarypath}/.git" ]; then
         echo "Antora will not run on a git module. Copying to /tmp"
-        cd ..
         cp -rp ${librarypath} /tmp/
         cd /tmp/${REPONAME}
         rm .git

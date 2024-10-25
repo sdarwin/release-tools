@@ -496,7 +496,6 @@ if [ "$typeoption" = "main" ]; then
 elif [ "$typeoption" = "antora" ]; then
     if [ -f "${librarypath}/.git" ]; then
         echo "Antora will not run on a git module. Copying to /tmp"
-        cd ..
         cp -rp ${librarypath} /tmp/
         cd /tmp/${REPONAME}
         rm .git
