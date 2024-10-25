@@ -679,8 +679,9 @@ if ($typeoption -eq "antora") {
     if ( Test-Path "${librarypath}\.git" -PathType Leaf ) {
         Write-Output "Antora will not run on a git module. Copying to /tmp"
         New-Item -Path "c:\" -Name "tmp" -ItemType "directory"  -Force
-        Copy-Item -Path "${librarypath}\*" -Destination "C:\tmp\${REPONAME}\" -Recurse -Container
-        cd /tmp/${REPONAME}
+        Copy-Item -Path "${librarypath}\*" -Destination "C:\tmp\${REPONAME}\" -Recurse -Force
+        cd C:\tmp\${REPONAME}\
+        dir
         $librarypath=$(pwd)
         rm .git
         git init
