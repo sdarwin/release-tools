@@ -699,7 +699,7 @@ if ($typeoption -eq "antora") {
 
 
     if ( $library_is_submodule -eq "true" ) {
-        New-Item -Path "${BOOST_ROOT}\${librarypath}\doc\"" -Name "build" -ItemType "directory"  -Force
+        New-Item -Path "${BOOST_ROOT}\${librarypath}\doc\" -Name "build" -ItemType "directory"  -Force
         Copy-Item -Path "build\*" -Destination "${BOOST_ROOT}\${librarypath}\doc\build\" -Recurse -Force
     }
 
