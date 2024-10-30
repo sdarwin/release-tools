@@ -686,7 +686,7 @@ if ($typeoption -eq "antora") {
         Copy-Item -Path "${librarypath}\*" -Destination "C:\tmp\${REPONAME}-${timestamp}\" -Recurse -Force
         Set-Location C:\tmp\${REPONAME}-${timestamp}\
         Get-ChildItem
-        Remove-Item .git
+        Remove-Item .git -Force
         git init
         Set-Location doc
     }
