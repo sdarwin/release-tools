@@ -308,6 +308,16 @@ if ( -Not ${skip-packages} ) {
             choco install -y --no-progress 7zip.install
         }
 
+        if ( -Not (Get-Command cmake -errorAction SilentlyContinue) )
+        {
+            choco install -y cmake --installargs 'ADD_CMAKE_TO_PATH=System' --apply-install-arguments-to-dependencies
+        }
+
+        if ( -Not (Get-Command ninja -errorAction SilentlyContinue) )
+        {
+            choco install -y ninja
+        }
+
         if ( -Not (Get-Command nvm -errorAction SilentlyContinue) )
           {
               # 1.1.12 doesn't allow reading stdout. Will be fixed in 1.1.13 supposedly.
@@ -501,7 +511,7 @@ if ( ${skip-boost} ) {
                 Remove-Item $librarypath -Force -Recurse
             }
             # Copy-Item -Exclude boost-root -Path $BOOST_SRC_FOLDER -Destination $librarypath -Recurse -Force
-	    robocopy $BOOST_SRC_FOLDER $librarypath /MIR /XD boost-root | Out-Null
+            robocopy $BOOST_SRC_FOLDER $librarypath /MIR /XD boost-root | Out-Null
             }
         }
     }
@@ -540,7 +550,7 @@ else {
             Remove-Item $librarypath -Force -Recurse
         }
         # Copy-Item -Exclude boost-root -Path $BOOST_SRC_FOLDER -Destination $librarypath -Recurse -Force
-	robocopy $BOOST_SRC_FOLDER $librarypath /MIR /XD boost-root | Out-Null
+        robocopy $BOOST_SRC_FOLDER $librarypath /MIR /XD boost-root | Out-Null
     }
 }
 
@@ -594,7 +604,7 @@ if ( -Not ${skip-boost} ) {
             Remove-Item $librarypath -Force -Recurse
         }
         # Copy-Item -Exclude boost-root -Path $BOOST_SRC_FOLDER -Destination $librarypath -Recurse -Force
-	robocopy $BOOST_SRC_FOLDER $librarypath /MIR /XD boost-root | Out-Null
+        robocopy $BOOST_SRC_FOLDER $librarypath /MIR /XD boost-root | Out-Null
     }
 
     $matcher='\.saxonhe_jar = \$(jar\[1\]) ;$'
@@ -682,8 +692,8 @@ if ($typeoption -eq "antora") {
         $timestamp=[int](Get-Date -UFormat %s -Millisecond 0)
         Write-Output "Antora will not run on a git module. Copying to /tmp"
         New-Item -Path "c:\" -Name "tmp" -ItemType "directory"  -Force
-        New-Item -Path "c:\" -Name "builddocs-${timestamp}"  -ItemType "directory"  -Force
-        New-Item -Path "c:\builddocs-${timestamp}" -Name "${REPONAME}" -ItemType "directory"  -Force
+        New-Item -Path "c:\tmp" -Name "builddocs-${timestamp}"  -ItemType "directory"  -Force
+        New-Item -Path "c:\tmp\builddocs-${timestamp}" -Name "${REPONAME}" -ItemType "directory"  -Force
         robocopy "${librarypath}" "C:\tmp\builddocs-${timestamp}\${REPONAME}" /MIR
         Set-Location "C:\tmp\builddocs-${timestamp}\${REPONAME}"
         Get-ChildItem
