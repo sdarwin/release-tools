@@ -101,9 +101,9 @@ export BOOST_SRC_FOLDER=$(git rev-parse --show-toplevel 2> /dev/null || echo "no
 # and doesn't use external directories.
 if [ "${boostrootsubdiroption}" = "yes" ]; then
     mkdir -p "${BOOST_SRC_FOLDER}/tmp_home"
-    export HOME=${BOOST_SRC_FOLDER}/tmp_home 
+    export HOME=${BOOST_SRC_FOLDER}/tmp_home
 fi
-    
+
 if [ "${REPONAME}" = "empty" -o "${REPONAME}" = "release-tools" ]; then
     echo -e "\nSet the path_to_library as the first command-line argument:\n\n$scriptname _path_to_library_\n\nOr change the working directory to that first.\n"
     exit 1
