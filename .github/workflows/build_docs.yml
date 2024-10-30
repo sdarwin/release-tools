@@ -294,10 +294,15 @@ jobs:
                 pwd
                 windowsdocs.ps1
                 if ( ! $LASTEXITCODE -eq 0)  {
-                    echo '..failed. DOCS BUILD FAILED. LIBRARY system'
-                    echo 'doc build failed in github actions. exiting.'
+                    echo '..failed. Runwindowsdocs pre-build FAILED.'
+                    pwd
                     # exit 1
                 }
+                else {
+                    echo "Runwindowsdocs pre-build SUCCEEDED."
+                    pwd
+                }
+
             }
 
             # 'git submodule foreach' isn't seeing declared functions.
