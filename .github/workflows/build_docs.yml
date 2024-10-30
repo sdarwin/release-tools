@@ -290,6 +290,7 @@ jobs:
             echo $null >> C:\failed.txt
 
             function Runwindowsdocs {
+                echo 'In Runwindowsdocs function'
                 pwd
                 windowsdocs.ps1
                 if ( ! $LASTEXITCODE -eq 0)  {
