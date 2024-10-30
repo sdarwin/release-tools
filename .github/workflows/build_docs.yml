@@ -364,11 +364,10 @@ jobs:
             Runwindowsdocs
             cd ../..
 
-            # YES DO THIS but it's not ready yet
-            # # Run at least one antora build that installs everything
-            # cd libs/url
-            # Runwindowsdocs
-            # cd ../..
+            # Run at least one antora build that installs everything
+            cd libs/url
+            Runwindowsdocs
+            cd ../..
 
             # For the rest --quick
             git submodule foreach 'powershell -command C:/scripts/cifunctions.ps1 $name'
