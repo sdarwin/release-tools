@@ -316,6 +316,7 @@ if ( -Not ${skip-packages} ) {
         if ( -Not (Get-Command ninja -errorAction SilentlyContinue) )
         {
             choco install -y ninja
+            Expand-Archive -LiteralPath 'C:\ProgramData\chocolatey\lib\ninja\tools\ninja-win_x32.zip' -DestinationPath C:\windows\system32\
         }
 
         if ( -Not (Get-Command nvm -errorAction SilentlyContinue) )
