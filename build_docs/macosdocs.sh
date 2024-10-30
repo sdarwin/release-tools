@@ -512,6 +512,11 @@ elif [ "$typeoption" = "antora" ]; then
     chmod 755 build_antora.sh
     ./build_antora.sh
 
+    if [ ! -f build/site/index.html ]; then
+        echo "build/site/index.html is missing. It is likely that antora did not complete successfully."
+        exit 1
+    fi
+
     if [ "$library_is_submodule" = "true" ]; then
         mkdir -p ${BOOST_ROOT}/${librarypath}/doc/build/
         cp -rp build/* ${BOOST_ROOT}/${librarypath}/doc/build/

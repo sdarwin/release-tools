@@ -697,6 +697,10 @@ if ($typeoption -eq "antora") {
 	dos2unix .\build_antora.sh
     & 'C:\Program Files\Git\bin\bash.exe' .\build_antora.sh
 
+    if ( -Not (Test-Path -Path "build\site\index.html") ) {
+        Write-Output "build\site\index.html is missing. It is likely that antora did not complete successfully."
+        exit 1
+    }
 
     if ( $library_is_submodule -eq "true" ) {
         New-Item -Path "${BOOST_ROOT}\${librarypath}\doc\" -Name "build" -ItemType "directory"  -Force
