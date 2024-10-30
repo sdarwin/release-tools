@@ -682,9 +682,10 @@ if ($typeoption -eq "antora") {
         $timestamp=[int](Get-Date -UFormat %s -Millisecond 0)
         Write-Output "Antora will not run on a git module. Copying to /tmp"
         New-Item -Path "c:\" -Name "tmp" -ItemType "directory"  -Force
-        New-Item -Path "c:\tmp\" -Name "${REPONAME}-${timestamp}" -ItemType "directory"  -Force
-        Copy-Item -Path "${librarypath}\*" -Destination "C:\tmp\${REPONAME}-${timestamp}\" -Recurse -Force
-        Set-Location C:\tmp\${REPONAME}-${timestamp}\
+        New-Item -Path "c:\" -Name "builddocs-${timestamp}"  -ItemType "directory"  -Force
+        New-Item -Path "c:\builddocs-${timestamp}" -Name "${REPONAME}" -ItemType "directory"  -Force
+        Copy-Item -Path "${librarypath}\*" -Destination "C:\tmp\builddocs-${timestamp}\${REPONAME}\" -Recurse -Force
+        Set-Location "C:\tmp\builddocs-${timestamp}\${REPONAME}"
         Get-ChildItem
         Remove-Item .git -Force
         git init

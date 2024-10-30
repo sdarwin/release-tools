@@ -500,9 +500,10 @@ elif [ "$typeoption" = "antora" ]; then
         library_is_submodule="true"
         timestamp=$(date +%s)
         echo "Antora will not run on a git module. Copying to /tmp"
-        cp -rp ${librarypath} /tmp/${REPONAME}-${timestamp}
-        cd /tmp/${REPONAME}-${timestamp}
-        rm .git
+        mkdir -p /tmp/builddocs-${timestamp}/${REPONAME}
+        cp -rp ${librarypath}/* /tmp/builddocs-${timestamp}/${REPONAME}/
+        cd /tmp/builddocs-${timestamp}/${REPONAME}/
+        rm -f .git
         git init
         cd doc
     else
