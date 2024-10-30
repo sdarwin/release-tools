@@ -470,6 +470,10 @@ elif [ "$typeoption" = "antora" ]; then
         cd /tmp/builddocs-${timestamp}/${REPONAME}/
         rm -f .git
         git init
+        git config user.email "test@example.com"
+        git config user.name "test"
+        git add .
+        git commit -m "initial commit"
         cd doc
     else 
         cd ${librarypath}/doc

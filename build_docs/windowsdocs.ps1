@@ -684,11 +684,15 @@ if ($typeoption -eq "antora") {
         New-Item -Path "c:\" -Name "tmp" -ItemType "directory"  -Force
         New-Item -Path "c:\" -Name "builddocs-${timestamp}"  -ItemType "directory"  -Force
         New-Item -Path "c:\builddocs-${timestamp}" -Name "${REPONAME}" -ItemType "directory"  -Force
-		robocopy "${librarypath}" "C:\tmp\builddocs-${timestamp}\${REPONAME}" /MIR
+        robocopy "${librarypath}" "C:\tmp\builddocs-${timestamp}\${REPONAME}" /MIR
         Set-Location "C:\tmp\builddocs-${timestamp}\${REPONAME}"
         Get-ChildItem
         Remove-Item .git -Force
         git init
+        git config user.email "test@example.com"
+        git config user.name "test"
+        git add .
+        git commit -m "initial commit"
         Set-Location doc
     }
     else {
@@ -704,9 +708,8 @@ if ($typeoption -eq "antora") {
 
     if ( $library_is_submodule -eq "true" ) {
         New-Item -Path "${BOOST_ROOT}\${librarypath}\doc\" -Name "build" -ItemType "directory"  -Force
-		robocopy build "${BOOST_ROOT}\${librarypath}\doc\build" /MIR
+        robocopy build "${BOOST_ROOT}\${librarypath}\doc\build" /MIR
     }
-
 }
 elseif ($typeoption -eq "main") {
 
