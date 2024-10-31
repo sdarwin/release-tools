@@ -555,6 +555,9 @@ else {
     }
 }
 
+# for Alan's antora scripts:
+$Env:BOOST_SRC_DIR=$Env:BOOST_ROOT
+
 if ( -Not ${skip-packages} ) {
     mkdir build
     Set-Location build

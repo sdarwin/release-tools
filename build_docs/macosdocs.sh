@@ -374,6 +374,9 @@ else
     fi
 fi
 
+# for Alan's antora scripts:
+export BOOST_SRC_DIR=${BOOST_ROOT}
+
 if [ "$skippackagesoption" != "yes" ]; then
     mkdir -p build && cd build
     if [ ! -f docbook-xsl.zip ]; then

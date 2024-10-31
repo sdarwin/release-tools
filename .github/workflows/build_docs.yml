@@ -33,7 +33,7 @@ jobs:
           - os: ubuntu-latest
             container: ubuntu:24.04
             packages: python-is-python3
-            skiplist: auto_index geometry url
+            skiplist: auto_index geometry
             flags: --debug
           - os: ubuntu-latest
             container: ubuntu:22.04
@@ -100,9 +100,9 @@ jobs:
             cd ../..
 
             # Run at least one antora build that installs everything
-            # cd libs/url
-            # linuxdocs.sh ${{ matrix.flags }}
-            # cd ../..
+            cd libs/url
+            linuxdocs.sh ${{ matrix.flags }}
+            cd ../..
 
             textpart1='#!/bin/bash
             reponame=$1
