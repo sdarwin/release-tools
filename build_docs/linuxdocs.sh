@@ -36,19 +36,19 @@ optional arguments:
                         Another option is \"cppalv1\" which had installed the prerequisites used by boostorg/json and a few other similar libraries.
                         More \"types\" can be added in the future if your library needs a specific set of packages installed.
                         The type is usually auto-detected and doesn't need to be specified.
-  --skip-boost   	Skip downloading boostorg/boost and building b2 if you are certain those steps have already been done.
-  --skip-packages	Skip installing all packages (pip, gem, apt, etc.) if you are certain that has already been done.
-  -q, --quick		Equivalent to setting both --skip-boost and --skip-packages. If not sure, then don't skip these steps.
-  --boostrelease	Add the target //boostrelease to the doc build. This target is used when building production releases.
-  --boostrootsubdir	If creating a boost-root directory, instead of placing it in ../ use a subdirectory.
+  --skip-boost          Skip downloading boostorg/boost and building b2 if you are certain those steps have already been done.
+  --skip-packages       Skip installing all packages (pip, gem, apt, etc.) if you are certain that has already been done.
+  -q, --quick           Equivalent to setting both --skip-boost and --skip-packages. If not sure, then don't skip these steps.
+  --boostrelease        Add the target //boostrelease to the doc build. This target is used when building production releases.
+  --boostrootsubdir     If creating a boost-root directory, instead of placing it in ../ use a subdirectory.
   --debug               Debugging.
 standard arguments:
-  path_to_library	Where the library is located. Defaults to current working directory.
+  path_to_library       Where the library is located. Defaults to current working directory.
 """
 
             echo ""
-	    echo "$helpmessage" ;
-	    echo ""
+            echo "$helpmessage" ;
+            echo ""
             exit 0
             ;;
         -t|--type)
@@ -56,19 +56,19 @@ standard arguments:
                 "") typeoption="" ; shift 2 ;;
                  *) typeoption=$2 ; shift 2 ;;
             esac ;;
-	--skip-boost)
-	    skipboostoption="yes" ; shift 2 ;;
-	--debug)
+        --skip-boost)
+            skipboostoption="yes" ; shift 2 ;;
+        --debug)
             # shellcheck disable=SC2034
-	    debugoption="yes" ; set -x ; shift 2 ;;
-	--skip-packages)
-	    skippackagesoption="yes" ; shift 2 ;;
-	-q|--quick)
-	    skipboostoption="yes" ; skippackagesoption="yes" ; shift 2 ;;
-	--boostrelease)
-	    boostrelease="//boostrelease" ; shift 2 ;;
-	--boostrootsubdir)
-	    boostrootsubdiroption="yes" ; BOOSTROOTRELPATH="." ; shift 2 ;;
+            debugoption="yes" ; set -x ; shift 2 ;;
+        --skip-packages)
+            skippackagesoption="yes" ; shift 2 ;;
+        -q|--quick)
+            skipboostoption="yes" ; skippackagesoption="yes" ; shift 2 ;;
+        --boostrelease)
+            boostrelease="//boostrelease" ; shift 2 ;;
+        --boostrootsubdir)
+            boostrootsubdiroption="yes" ; BOOSTROOTRELPATH="." ; shift 2 ;;
         --) shift ; break ;;
         *) echo "Internal error!" ; exit 1 ;;
     esac
@@ -128,7 +128,7 @@ else
     # most libraries
     # shellcheck disable=SC2046
     PARENTNAME=$(basename -s .git $(git --git-dir "${BOOST_SRC_FOLDER}"/../../.git config --get remote.origin.url) 2> /dev/null || echo "not_found")
-    if [ -n "${PARENTNAME}" ] &&  [ "${PARENTNAME}" = "boost" ]; then
+    if [ -n "${PARENTNAME}" ] && [ "${PARENTNAME}" = "boost" ]; then
         echo "Starting out inside boost-root."
         BOOSTROOTLIBRARY="yes"
         BOOSTROOTRELPATH="../.."
@@ -199,7 +199,7 @@ if [ "$skippackagesoption" != "yes" ]; then
 
     if [ "$typeoption" = "antora" ] || [ "$install_antora_deps" = "yes" ]; then
 
-        mkdir -p ~/.nvm_"${REPONAME}"_antora
+        mkdir -p ~/".nvm_${REPONAME}_antora"
         export NODE_VERSION=18.18.1
         # The container has a pre-installed nodejs. Overwrite those again.
         export NVM_BIN="$HOME/.nvm_${REPONAME}_antora/versions/node/v${NODE_VERSION}/bin"
@@ -235,8 +235,8 @@ if [ "$skippackagesoption" != "yes" ]; then
         source "${pythonvirtenvpath}/bin/activate"
 
         # the next two gems are for asciidoctor-pdf
-        sudo gem install public_suffix --version 4.0.7		# 4.0.7 from 2022 still supports ruby 2.5. Continue to use until ~2024.
-        sudo gem install css_parser --version 1.12.0		# 1.12.0 from 2022 still supports ruby 2.5. Continue to use until ~2024.
+        sudo gem install public_suffix --version 4.0.7  # 4.0.7 from 2022 still supports ruby 2.5. Continue to use until ~2024.
+        sudo gem install css_parser --version 1.12.0  # 1.12.0 from 2022 still supports ruby 2.5. Continue to use until ~2024.
         sudo gem install asciidoctor --version 2.0.17
         sudo gem install asciidoctor-pdf --version 2.3.4
         sudo gem install asciidoctor-diagram --version 2.2.14
@@ -260,7 +260,7 @@ if [ "$skippackagesoption" != "yes" ]; then
         pip3 install six==1.14.0
 
         # Locking the version numbers in place offers a better guarantee of a known, good build.
-	# At the same time, it creates a perpetual outstanding task, to upgrade the gem and pip versions
+        # At the same time, it creates a perpetual outstanding task, to upgrade the gem and pip versions
         # because they are out-of-date. When upgrading everything check the Dockerfiles and the other build scripts.
     fi
 
@@ -328,10 +328,10 @@ if [ "$skipboostoption" = "yes" ] ; then
         export BOOST_ROOT
         librarypath=$(getlibrarypath "$REPONAME")
     else
-        cd $BOOSTROOTRELPATH
+        cd "$BOOSTROOTRELPATH"
         if [ ! -d boost-root ]; then
-	    echo "boost-root missing. Rerun this script without --skip-boost or --quick option."
-	    exit 1
+            echo "boost-root missing. Rerun this script without --skip-boost or --quick option."
+            exit 1
         else
             cd boost-root
             BOOST_ROOT=$(pwd)
@@ -357,11 +357,11 @@ else
         if [ ! -d boost-root ]; then
             git clone -b $BOOST_BRANCH https://github.com/boostorg/boost.git boost-root --depth 1
             cd boost-root
-	else
-	    cd boost-root
+        else
+            cd boost-root
             git checkout $BOOST_BRANCH
             git pull
-	fi
+        fi
         BOOST_ROOT=$(pwd)
         export BOOST_ROOT
         librarypath=$(getlibrarypath "$REPONAME")
@@ -377,7 +377,7 @@ if [ "$EXPORT_BOOST_SRC_DIR" = "yes" ]; then
     export BOOST_SRC_DIR=${BOOST_ROOT}
 fi
 
-if [ "$skippackagesoption" != "yes" ] ; then
+if [ "$skippackagesoption" != "yes" ]; then
     mkdir -p build && cd build
     if [ ! -f docbook-xsl.zip ]; then
         wget -O docbook-xsl.zip https://sourceforge.net/projects/docbook/files/docbook-xsl/1.79.1/docbook-xsl-1.79.1.zip/download
@@ -460,7 +460,7 @@ if [ ! -d "$librarypath/doc" ]; then
     exit 0
 fi
 
-if [ -f "$librarypath/doc/build_antora.sh" ] ||  [ -f "$librarypath/doc/Jamfile" ] || [ -f "$librarypath/doc/jamfile" ] || [ -f "$librarypath/doc/Jamfile.v2" ] || [ -f "$librarypath/doc/jamfile.v2" ] || [ -f "$librarypath/doc/Jamfile.v3" ] || [ -f "$librarypath/doc/jamfile.v3" ] || [ -f "$librarypath/doc/Jamfile.jam" ] || [ -f "$librarypath/doc/jamfile.jam" ] || [ -f "$librarypath/doc/build.jam" ] ; then
+if [ -f "$librarypath/doc/build_antora.sh" ] || [ -f "$librarypath/doc/Jamfile" ] || [ -f "$librarypath/doc/jamfile" ] || [ -f "$librarypath/doc/Jamfile.v2" ] || [ -f "$librarypath/doc/jamfile.v2" ] || [ -f "$librarypath/doc/Jamfile.v3" ] || [ -f "$librarypath/doc/jamfile.v3" ] || [ -f "$librarypath/doc/Jamfile.jam" ] || [ -f "$librarypath/doc/jamfile.jam" ] || [ -f "$librarypath/doc/build.jam" ] ; then
      : # ok
 else
     echo "doc/Jamfile or similar is missing for this library. No need to compile. Exiting."
@@ -477,7 +477,7 @@ if [ "$REPONAME" = "geometry" ]; then
     ls -al dist/bin || true
 fi
 
-# -------------------------------
+# -----------------------------------
 
 # the main compilation:
 
@@ -507,7 +507,7 @@ elif [ "$typeoption" = "antora" ]; then
         git add .
         git commit -m "initial commit"
         cd doc
-    else 
+    else
         cd "${librarypath}/doc"
     fi
     chmod 755 build_antora.sh
@@ -517,11 +517,11 @@ elif [ "$typeoption" = "antora" ]; then
         echo "build/site/index.html is missing. It is likely that antora did not complete successfully."
         exit 1
     fi
-        
+
     if [ "$library_is_submodule" = "true" ]; then
         mkdir -p "${BOOST_ROOT}/${librarypath}/doc/build/"
         cp -rp build/* "${BOOST_ROOT}/${librarypath}/doc/build/"
-    fi   
+    fi
 
 elif [ "$typeoption" = "cppalv1" ]; then
     echo "using doxygen ; using boostbook ; using saxonhe ;" > tools/build/src/user-config.jam

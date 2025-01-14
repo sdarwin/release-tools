@@ -89,7 +89,7 @@ standard arguments:
         --skip-boost)
             skipboostoption="yes" ; shift 2 ;;
         --debug)
-            # shellcheck disable=2034
+            # shellcheck disable=SC2034
             debugoption="yes" ; set -x ; shift 2 ;;
         --skip-packages)
             skippackagesoption="yes" ; shift 2 ;;
@@ -117,7 +117,7 @@ fi
 
 # DETERMINE REPOSITORY
 
-# shellcheck disable=2046
+# shellcheck disable=SC2046
 REPONAME=$(basename -s .git $(git config --get remote.origin.url) 2> /dev/null || echo "empty")
 export REPONAME
 BOOST_SRC_FOLDER=$(git rev-parse --show-toplevel 2> /dev/null || echo "nofolder")
@@ -140,15 +140,15 @@ fi
 # CHECK IF RUNNING IN BOOST-ROOT
 
 # this case applies to boostorg/more
-# shellcheck disable=2046
+# shellcheck disable=SC2046
 PARENTNAME=$(basename -s .git $(git --git-dir "${BOOST_SRC_FOLDER}"/../.git config --get remote.origin.url) 2> /dev/null || echo "not_found")
-if [ -n "${PARENTNAME}" ] &&  [ "${PARENTNAME}" = "boost" ]; then
+if [ -n "${PARENTNAME}" ] && [ "${PARENTNAME}" = "boost" ]; then
     echo "Starting out inside boost-root."
     BOOSTROOTLIBRARY="yes"
     BOOSTROOTRELPATH=".."
 else
     # most libraries
-    # shellcheck disable=2046
+    # shellcheck disable=SC2046
     PARENTNAME=$(basename -s .git $(git --git-dir "${BOOST_SRC_FOLDER}"/../../.git config --get remote.origin.url) 2> /dev/null || echo "not_found")
     if [ -n "${PARENTNAME}" ] && [ "${PARENTNAME}" = "boost" ]; then
         echo "Starting out inside boost-root."
@@ -156,7 +156,7 @@ else
         BOOSTROOTRELPATH="../.."
     else
         # numerics
-        # shellcheck disable=2046
+        # shellcheck disable=SC2046
         PARENTNAME=$(basename -s .git $(git --git-dir "${BOOST_SRC_FOLDER}"/../../../.git config --get remote.origin.url) 2> /dev/null || echo "not_found")
         if [ -n "${PARENTNAME}" ] && [ "${PARENTNAME}" = "boost" ]; then
             echo "Starting out inside boost-root."
@@ -262,7 +262,7 @@ if [ "$skippackagesoption" != "yes" ]; then
     if [ "$typeoption" = "main" ]; then
 
         if [ ! -f "${pythonvirtenvpath}/bin/activate" ]; then
-           python3 -m venv "${pythonvirtenvpath}"
+            python3 -m venv "${pythonvirtenvpath}"
         fi
         # shellcheck source=/dev/null
         source "${pythonvirtenvpath}/bin/activate"
@@ -270,8 +270,8 @@ if [ "$skippackagesoption" != "yes" ]; then
 	brew install ghostscript
 	brew install texlive
         brew install graphviz
-        sudo gem install public_suffix --version 4.0.7               # 4.0.7 from 2022 still supports ruby 2.5. Continue to use until ~2024.
-        sudo gem install css_parser --version 1.12.0                 # 1.12.0 from 2022 still supports ruby 2.5. Continue to use until ~2024.
+        sudo gem install public_suffix --version 4.0.7  # 4.0.7 from 2022 still supports ruby 2.5. Continue to use until ~2024.
+        sudo gem install css_parser --version 1.12.0  # 1.12.0 from 2022 still supports ruby 2.5. Continue to use until ~2024.
         sudo gem install asciidoctor --version 2.0.17
         sudo gem install asciidoctor-pdf --version 2.3.4
         sudo gem install asciidoctor-diagram --version 2.2.14
@@ -331,7 +331,7 @@ if [ -d "$HOME/.nvm_${REPONAME}_antora" ]; then
         export NVM_DIR=$HOME/.nvm_${REPONAME}_antora
         export NVM_INC=$HOME/.nvm_${REPONAME}_antora/versions/node/v${NODE_VERSION}/include/node
         # shellcheck source=/dev/null
-        . "$NVM_DIR/nvm.sh" && nvm use v${NODE_VERSION}
+        . "$NVM_DIR/nvm.sh" && nvm use "v${NODE_VERSION}"
         export PATH="$HOME/.nvm_${REPONAME}_antora/versions/node/v${NODE_VERSION}/bin/:${PATH}"
         node --version
         npm --version
@@ -356,7 +356,7 @@ if [ "$skipboostoption" = "yes" ] ; then
         export BOOST_ROOT
         librarypath=$(getlibrarypath "$REPONAME")
     else
-	cd $BOOSTROOTRELPATH
+        cd "$BOOSTROOTRELPATH"
         if [ ! -d boost-root ]; then
             echo "boost-root missing. Rerun this script without --skip-boost or --quick option."
             exit 1
