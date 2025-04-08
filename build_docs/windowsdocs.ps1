@@ -22,7 +22,7 @@ $nvm_install_version="1.1.11"
 $node_version="20.17.0"
 $node_version_basic="20"
 
-Set-PSDebug -Trace 1
+# Set-PSDebug -Trace 1
 
 if ($help) {
 
@@ -49,6 +49,8 @@ standard arguments:
 "
 
 Write-Output $helpmessage
+# echo $helpmessage
+
 exit 0
 }
 if ($quick) { ${skip-boost} = $true ; ${skip-packages} = $true ; }
@@ -79,7 +81,7 @@ function refenv {
 
     # refreshenv might delete path entries. Return those to the path.
     $originalpath=$env:PATH
-    refreshenv
+    Update-SessionEnvironment
     $joinedpath="${originalpath};$env:PATH"
     $joinedpath=$joinedpath.replace(';;',';')
     $env:PATH = ($joinedpath -split ';' | Select-Object -Unique) -join ';'
@@ -141,7 +143,7 @@ function LocateCLCompiler([string] $docsFolder) {
     $ResultList = (Get-ChildItem -Exclude test*,.test*,windowsdocs.ps1 | Select-String -quiet "mrdocs")
     foreach ($result in $ResultList){
         if ($result -eq "True") {
-              # echo $result
+              # Write-Output $result
               $clang_required="yes"
         }
     }
@@ -151,11 +153,11 @@ function LocateCLCompiler([string] $docsFolder) {
     # Determine if a C++ compiler is available.
     get-command cl.exe *>$null
     if ( $? -eq "True" ) {
-            echo "Found cl.exe"
+            Write-Output "Found cl.exe"
             $cl_available="yes"
     }
     else {
-            echo "cl.exe not found"
+            Write-Output "cl.exe not found"
             $cl_available="no"
     }
 
@@ -165,17 +167,18 @@ function LocateCLCompiler([string] $docsFolder) {
     }
     else {
     # Include other Launch-VsDevShell.ps1 locations in this list:
-    $cl_command_attempts = @('C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\Common7\\Tools\\Launch-VsDevShell.ps1')
+    $cl_command_attempts = @('C:\\Program Files (x86)\\Microsoft Visual Studio\\2022\\BuildTools\\Common7\\Tools\\Launch-VsDevShell.ps1',
+	                         'C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\Tools\Launch-VsDevShell.ps1')
     foreach ($cl_command_attempt in $cl_command_attempts) {
         & $cl_command_attempt -arch amd64
         get-command cl.exe *>$null
         if ( $? -eq "True" ) {
-            echo "Found cl.exe"
+            Write-Output "Found cl.exe"
             $cl_available="yes"
             return
         }
         else {
-            echo "cl.exe not found"
+            Write-Output "cl.exe not found"
             $cl_available="no"
         }
     }
