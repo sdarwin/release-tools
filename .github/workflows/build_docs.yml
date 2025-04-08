@@ -289,6 +289,7 @@ jobs:
             flags: "-boostrelease"
             skiplist: contract hana log parameter parameter_python python url
           - os: windows-2022
+            lint: yes
             flags: "-boostrelease"
             skiplist: contract hana log parameter parameter_python python url
 
@@ -297,7 +298,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-
+      - name: Install ScriptAnalyzer pre-reqs
+        if: ${{ matrix.lint == 'yes' }}
+        run: |
+          # is anything needed
+          $true
+      - name: ScriptAnalyzer
+        if: ${{ matrix.lint == 'yes' }}
+        run: |
+          Invoke-ScriptAnalyzer -EnableExit build_docs/windowsdocs.ps1
       - name: docs
         shell: powershell
         run: |
