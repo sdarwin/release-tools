@@ -303,7 +303,9 @@ jobs:
       - name: Check cl.exe
         run: |
           Write-Output "Is cl.exe available"
-          echo $env
+          dir $env:
+          Write-Output "ErrorActionPreference is $ErrorActionPreference"
+          $ErrorActionPreference = "Continue"
           get-command cl.exe
           Write-Output "done with check?"
       - name: Install ScriptAnalyzer pre-reqs

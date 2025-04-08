@@ -151,6 +151,8 @@ function LocateCLCompiler([string] $docsFolder) {
     Set-Location $startdir
 
     # Determine if a C++ compiler is available.
+    $TmpErrorActionPreference = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
     get-command cl.exe *>$null
     if ( $? -eq "True" ) {
             Write-Output "Found cl.exe"
@@ -175,6 +177,7 @@ function LocateCLCompiler([string] $docsFolder) {
         if ( $? -eq "True" ) {
             Write-Output "Found cl.exe"
             $cl_available="yes"
+            $ErrorActionPreference = $TmpErrorActionPreference
             return
         }
         else {
@@ -184,6 +187,7 @@ function LocateCLCompiler([string] $docsFolder) {
     }
     Write-Output "MrDocs requires a C++ compiler, however one couldn't be found. There is a script here in build_docs/other/windows-VS-2022-clang.ps1 that may be used to install Visual Studio. After that, run this script again. If you believe the compiler cl.exe is available, feel free to examine this function LocateCLCompiler() and submit bug fixes."
     Write-Output "Exiting."
+    $ErrorActionPreference = $TmpErrorActionPreference
     exit 1
     }
 }
