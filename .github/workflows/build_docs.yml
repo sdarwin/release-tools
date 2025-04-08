@@ -65,6 +65,7 @@ jobs:
 
     timeout-minutes: 720
     runs-on: ${{matrix.os}}
+    if: false
     container: ${{matrix.container}}
 
     steps:
@@ -194,6 +195,7 @@ jobs:
 
     timeout-minutes: 720
     runs-on: ${{matrix.os}}
+    if: false
 
     steps:
 
@@ -298,6 +300,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+      - name: Check cl.exe
+        run: |
+          Write-Output "Is cl.exe available"
+          echo $env
+          get-command cl.exe
+          Write-Output "done with check?"
       - name: Install ScriptAnalyzer pre-reqs
         if: ${{ matrix.lint == 'yes' }}
         run: |
