@@ -116,6 +116,10 @@ jobs:
             # Run at least one antora build that installs everything
             cd libs/url
             linuxdocs.sh ${{ matrix.flags }}
+            # nvm would not be not loaded for other tests if they --skip-packages.
+            export NVM_DIR="$HOME/.nvm"
+            \. "$NVM_DIR/nvm.sh"
+
             cd ../..
 
             textpart1='#!/bin/bash
@@ -226,6 +230,9 @@ jobs:
             # Run at least one antora build that installs everything
             # cd libs/url
             # macosdocs.sh
+            # nvm would not be not loaded for other tests if they --skip-packages.
+            # export NVM_DIR="$HOME/.nvm"
+            # \. "$NVM_DIR/nvm.sh"
             # cd ../..
 
             textpart1='#!/bin/bash
