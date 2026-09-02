@@ -559,21 +559,28 @@ class script(script_common):
             return
 
         exclude_libraries = {"beast"}
-        doc_build = self.b2(
-            "-q",  # '-d0',
+        print("=== Doc build start (timestamped) ===
+")
+        result = utils.timestamped_call(
+            "b2",
+            "--debug-configuration",
+            "-j%s" % (self.jobs),
+            "-q",
             "--build-dir=%s" % (self.build_dir),
             "--distdir=%s" % (os.path.join(self.build_dir, "dist")),
             "--release-build",
             "--exclude-libraries=%s" % ",".join(exclude_libraries),
             "auto-index=on" if enable_auto_index else "auto-index=off",
             "--enable-index" if enable_auto_index else "",
-            parallel=True,
+            "",
         )
-        while doc_build.is_alive():
-            time.sleep(3 * 60)
-            print("--- Building ---")
-            utils.mem_info()
-        doc_build.join()
+        print("=== Doc build end ===
+")
+        if result != 0:
+            raise SystemCallError(
+                ("b2", "--debug-configuration", "-j%s" % (self.jobs)),
+                result,
+            )
 
         # Try to build beast docs separately to avoid breaking the build
         try:

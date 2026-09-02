@@ -56,6 +56,34 @@ class utils:
         return result
 
     @staticmethod
+    def timestamped_call(*command, **kargs):
+        """Run a command and prefix each output line with an ISO timestamp."""
+        import datetime
+        utils.log("%s> '%s' (timestamped)" % (os.getcwd(), "' '".join(command)))
+        t = time.time()
+        process = subprocess.Popen(
+            command,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT,
+            bufsize=1,
+            text=True,
+            **kargs,
+        )
+        for line in process.stdout:
+            ts = datetime.datetime.now().isoformat()
+            print("[%s] %s" % (ts, line), end="")
+        process.wait()
+        t = time.time() - t
+        if process.returncode != 0:
+            print("Failed: '%s' ERROR = %s" % ("' '".join(command), process.returncode))
+        utils.call_stats.append((t, os.getcwd(), command, process.returncode))
+        utils.log(
+            "%s> '%s' execution time %s seconds"
+            % (os.getcwd(), "' '".join(command), t)
+        )
+        return process.returncode
+
+    @staticmethod
     def print_call_stats():
         utils.log(
             "================================================================================"
